@@ -8,4 +8,4 @@ apiRouter.use('/v1', v1Router )
 // apiRouter.use('/v3', v3Router )
 
 
-export default apiRouter
+export default apiRouter;

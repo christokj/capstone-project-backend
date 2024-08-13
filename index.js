@@ -1,6 +1,9 @@
-const express = require('express');
-const cors = require('cors');
-const { default: apiRouter } = require('./routes');
+import express from "express";
+import { connectDB } from "./config/db.js";
+import apiRouter from "./routes/index.js";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+
 // require('dotenv').config();
 
 const app = express();
@@ -12,6 +15,7 @@ app.use(cookieParser());
 
 const PORT = process.env.PORT;
 
+// Connect to MongoDB Database
 connectDB();
 
 // use cookie sessions 
