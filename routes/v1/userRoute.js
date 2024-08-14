@@ -5,7 +5,7 @@ import asyncHandler from "../../utils/asyncHandler.js";
 // import { authUser } from "../../middlewares/authUser.js";
 const router = express.Router();
 
-router.post("/create",  asyncHandler(userCreate));
+router.post("/create", asyncHandler(userCreate));
 // router.post("/login", userLogin);
 // router.get("/profile/:id", authUser, userProfile);
 

@@ -1,14 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 
-// Function to create custom error objects
-const createError = (status, message, code) => ({
-    status: status || 500,
-    message: message || "Internal Server Error",
-    code: code || 'UNDEFINED_ERROR',
-    stack: new Error().stack,
-});
-
 // Function to log errors asynchronously to a file
 const logErrorToFile = async (err) => {
     const logPath = path.join('error.log');
@@ -31,12 +23,21 @@ const sendErrorResponse = async (err, res) => {
             code: err.code
         });
     } else {
-        // Production - Hide stack traces
-        res.status(err.status).json({
-            status: err.status,
-            message: err.message,
-            code: err.code
-        });
+        if (err.status) {
+            // Production - Hide stack traces
+            res.status(err.status).json({
+                status: err.status,
+                message: err.message,
+                code: err.code
+            });
+        } else {
+            res.json({
+                status: err.status || 400,
+                message: err.details[0].context.message || err.details[0].message,
+            });
+        }
+
+        console.log(err.details[0].context)
     }
 };
 
@@ -46,7 +47,7 @@ const asyncHandler = (fn) => async (req, res, next) => {
 
     try {
         // Optional: Simulate latency or delay in the async function for monitoring
-        // await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         // Execute the provided async function
         await fn(req, res, next);
@@ -56,10 +57,6 @@ const asyncHandler = (fn) => async (req, res, next) => {
     } catch (err) {
         console.error(`[${new Date().toISOString()}] - Error in request to ${req.method} ${req.originalUrl}:`, err);
 
-        // If the error does not have the expected properties, create a new one
-        if (!err.status || !err.message || !err.code) {
-            err = createError(err.status, err.message, err.code);
-        }
 
         // Log the error to a file
         try {

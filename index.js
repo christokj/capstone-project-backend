@@ -34,7 +34,9 @@ app.get("/", (req, res) => {
 app.use("/api", apiRouter);
 
 app.all("*", (req, res, next) => {
-  res.status(404).json({ message: "end point does not exist" });
+  if (!res.headersSent) {
+    res.status(404).json({ message: "End point does not exist" });
+  }
 });
 
 // Start Server
