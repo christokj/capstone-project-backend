@@ -29,10 +29,6 @@ const ReviewSchema = new Schema({
         trim: true,
         required: true,
     },
-    isVerifiedPurchase: {
-        type: Boolean,
-        default: false,
-    },
 }, {
     timestamps: true,
 });

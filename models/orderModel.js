@@ -39,7 +39,7 @@ const OrderSchema = new Schema({
     paymentMethod: {
         type: String,
         required: true,
-        enum: ['Credit Card', 'PayPal', 'Stripe', 'Cash on Delivery'], // Example payment methods
+        enum: ['Credit Card', 'PayPal', 'Cash on Delivery'], // Example payment methods
     },
     paymentResult: {
         status: { type: String },
@@ -47,16 +47,6 @@ const OrderSchema = new Schema({
         email_address: { type: String },
     },
     itemsPrice: {
-        type: Number,
-        required: true,
-        min: 0,
-    },
-    taxPrice: {
-        type: Number,
-        required: true,
-        min: 0,
-    },
-    shippingPrice: {
         type: Number,
         required: true,
         min: 0,
@@ -73,17 +63,9 @@ const OrderSchema = new Schema({
     paidAt: {
         type: Date,
     },
-    isDelivered: {
-        type: Boolean,
-        default: false,
-    },
-    deliveredAt: {
-        type: Date,
-    },
     status: {
         type: String,
         required: true,
-        enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'],
         default: 'Processing',
     },
 }, {

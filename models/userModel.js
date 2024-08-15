@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 const Schema = mongoose.Schema;
 
 // The user schema
@@ -80,8 +81,6 @@ const userSchema = new Schema(
     },
     {
         timestamps: true,
-        toJSON: { virtuals: true },
-        toObject: { virtuals: true },
     }
 );
 

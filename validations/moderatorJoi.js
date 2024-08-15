@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 // Validation function using Joi with custom logic 
-const validateUserData = async (data) => {
+const validateModeratorData = async (data) => {
     const schema = Joi.object({
         fullname: Joi.string()
             .min(3)
@@ -33,6 +33,10 @@ const validateUserData = async (data) => {
                 "string.empty": "Email is required.",
                 "string.pattern.base": "Please enter valid email.",
             }),
+            role: Joi.string()
+            .valid('user', 'admin', 'moderator')
+            .insensitive() // Makes the validation case-insensitive
+            .label('Role'),
 
         password: Joi.string()
             .min(8)
@@ -58,18 +62,11 @@ const validateUserData = async (data) => {
             .messages({
                 'string.pattern.base': 'Password must be between 8 and 30 characters and include letters, numbers, and special characters (!@#$%^&.*).'
             }),
-        address: Joi.object({
-            street: Joi.string().trim().required(),
-            city: Joi.string().trim().required(),
-            state: Joi.string().trim().required(),
-            zipCode: Joi.string().trim().required(),
-            country: Joi.string().trim().required(),
-        }).required(),
     });
 
     // Validate the data
-    const { error, fullname, email, password, mobile, address } = await schema.validateAsync(data);
-    const value = { fullname, email, password, mobile, address };
+    const { error, fullname, email, password, mobile, role } = await schema.validateAsync(data);
+    const value = { fullname, email, password, mobile, role };
     // Handle validation result
     if (error) {
         console.log('Validation error :', error.details[0].message);
@@ -79,4 +76,4 @@ const validateUserData = async (data) => {
     }
 };
 
-export default validateUserData;
+export default validateModeratorData;

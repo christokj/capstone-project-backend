@@ -15,13 +15,9 @@ const CategorySchema = new Schema({
         default: '',
     },
     image: {
-        type: String, // URL or path to the category image
+        type: String,
         trim: true,
         default: '',
-    },
-    isFeatured: {
-        type: Boolean,
-        default: false,
     },
 }, {
     timestamps: true,

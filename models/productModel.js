@@ -27,14 +27,8 @@ const ProductSchema = new Schema({
         type: String,
         trim: true,
     },
-    stock: {
-        type: Number,
-        required: true,
-        min: 0,
-        default: 0,
-    },
     images: [{
-        type: String, // URLs or paths to the product images
+        type: String, 
         required: true,
     }],
     rating: {
@@ -42,15 +36,6 @@ const ProductSchema = new Schema({
         default: 0,
         min: 0,
         max: 5,
-    },
-    numReviews: {
-        type: Number,
-        default: 0,
-        min: 0,
-    },
-    isFeatured: {
-        type: Boolean,
-        default: false,
     },
 }, {
     timestamps: true,
