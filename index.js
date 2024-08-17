@@ -3,6 +3,7 @@ import { connectDB } from "./config/db.js";
 import apiRouter from "./routes/index.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import session from "express-session";
 
 // require('dotenv').config();
 
@@ -25,6 +26,13 @@ connectDB();
 // 		keys: [process.env.COOKIE_SESSION_KEY],
 // 	})
 // );
+
+app.use(session({
+  secret: "otp",
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false, maxAge: 300000 } 
+}));
 
 // Routes
 app.get("/", (req, res) => {

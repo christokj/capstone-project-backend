@@ -3,7 +3,13 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema({
-    name: {
+    id: { 
+        type: Number,
+         required: true,
+        unique: true,
+        min: 1,
+    },
+    title: {
         type: String,
         required: true,
         trim: true,
@@ -19,13 +25,9 @@ const ProductSchema = new Schema({
         min: 0,
     },
     category: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    brand: {
-        type: String,
-        trim: true,
+        id: { type: String, trim: true, required: true },
+        name: { type: String, trim: true, required: true },
+        image: { type: String, trim: true, required: true }
     },
     images: [{
         type: String, 
@@ -41,6 +43,5 @@ const ProductSchema = new Schema({
     timestamps: true,
 });
 
-const Product = mongoose.model('Product', ProductSchema);
+export const Product = mongoose.model('Product', ProductSchema);
 
-module.exports = Product;

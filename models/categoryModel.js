@@ -3,16 +3,16 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const CategorySchema = new Schema({
+    id: { 
+        type: Number,
+         required: true,
+        unique: true,
+        min: 1,
+    },
     name: {
         type: String,
         required: true,
-        unique: true,
         trim: true,
-    },
-    description: {
-        type: String,
-        trim: true,
-        default: '',
     },
     image: {
         type: String,
@@ -23,6 +23,6 @@ const CategorySchema = new Schema({
     timestamps: true,
 });
 
-const Category = mongoose.model('Category', CategorySchema);
+export const Category = mongoose.model('Category', CategorySchema);
 
-module.exports = Category;
+
