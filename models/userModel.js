@@ -111,15 +111,15 @@ userSchema.methods.updateLastLogin = function () {
     return this.save();
 };
 
-// Method to change the user's role
-userSchema.methods.changeRole = function (newRole) {
-    if (["user", "admin", "moderator"].includes(newRole)) {
-        this.role = newRole;
-        return this.save();
-    } else {
-        throw new Error("Invalid role");
-    }
-};
+// // Method to change the user's role
+// userSchema.methods.changeRole = function (newRole) {
+//     if (["user", "admin", "moderator"].includes(newRole)) {
+//         this.role = newRole;
+//         return this.save();
+//     } else {
+//         throw new Error("Invalid role");
+//     }
+// };
 
 // Export the user model
 export const User = mongoose.model("User", userSchema);

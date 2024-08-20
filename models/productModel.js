@@ -25,14 +25,14 @@ const ProductSchema = new Schema({
         min: 0,
     },
     category: {
-        id: { type: String, trim: true, required: true },
-        name: { type: String, trim: true, required: true },
-        image: { type: String, trim: true, required: true }
-    },
-    images: [{
+        type: String,
+          trim: true,
+           required: true 
+        },
+    image: {
         type: String, 
         required: true,
-    }],
+    },
     rating: {
         type: Number,
         default: 0,

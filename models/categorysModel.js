@@ -17,7 +17,7 @@ const CategorySchema = new Schema({
     image: {
         type: String,
         trim: true,
-        default: '',
+        required: true,
     },
 }, {
     timestamps: true,
