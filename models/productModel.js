@@ -3,18 +3,14 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema({
-    id: { 
-        type: Number,
-         required: true,
-        unique: true,
-        min: 1,
-    },
+
+    id: { type: String, unique: true, default: () => new mongoose.Types.ObjectId().toString() },
     title: {
         type: String,
         required: true,
         trim: true,
     },
-    description: {
+    description: { 
         type: String,
         required: true,
         trim: true,
@@ -26,15 +22,19 @@ const ProductSchema = new Schema({
     },
     category: {
         type: String,
-          trim: true,
-           required: true 
-        },
+        trim: true,
+        required: true
+    },
     image: {
-        type: String, 
+        type: [String],
+        required: true,
+    },
+    shopName: {
+        type: String,
         required: true,
     },
     rating: {
-        type: Number,
+        type: Number, 
         default: 0,
         min: 0,
         max: 5,

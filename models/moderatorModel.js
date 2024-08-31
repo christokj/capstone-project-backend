@@ -34,6 +34,11 @@ const moderatorSchema = new mongoose.Schema(
                 message: (props) => `${props.value} is not a valid mobile number!`,
             },
         },
+        status: {
+            type: String,
+            enum: ["active", "inactive", "suspended"],
+            default: "active",
+        },
         role: {
             type: String,
             enum: ["moderator", "admin"],
@@ -42,7 +47,7 @@ const moderatorSchema = new mongoose.Schema(
         password: {
             type: String,
             required: [true, "Password is required"],
-            minLength: [6, "Password must be at least 6 characters long"],
+            minLength: [8, "Password must be at least 8 characters long"],
             maxLength: [100, "Password cannot exceed 100 characters"],
         },
     },

@@ -44,24 +44,15 @@ const userSchema = new Schema(
             },
         },
         address: {
-            street: { type: String, trim: true, required: true},
+            street: { type: String, trim: true, required: true },
             city: { type: String, trim: true, required: true },
             state: { type: String, trim: true, required: true },
             zipCode: { type: String, trim: true, required: true },
             country: { type: String, trim: true, required: true },
         },
-        cart: {
-            items: [{
-                productId: { type: Schema.Types.ObjectId, ref: 'Product' },
-                quantity: { type: Number, default: 1 },
-            }],
-            total: {
-                type: Number,
-                default: 0,
-            }
-        },
         orderHistory: [{
-            orderId: { type: Schema.Types.ObjectId, ref: 'Order' },
+            productId: { type: Schema.Types.ObjectId, ref: 'Product' },
+            quantity: { type: Number, default: 1 },
             date: { type: Date, default: Date.now },
         }],
         role: {
@@ -111,15 +102,6 @@ userSchema.methods.updateLastLogin = function () {
     return this.save();
 };
 
-// // Method to change the user's role
-// userSchema.methods.changeRole = function (newRole) {
-//     if (["user", "admin", "moderator"].includes(newRole)) {
-//         this.role = newRole;
-//         return this.save();
-//     } else {
-//         throw new Error("Invalid role");
-//     }
-// };
 
 // Export the user model
 export const User = mongoose.model("User", userSchema);

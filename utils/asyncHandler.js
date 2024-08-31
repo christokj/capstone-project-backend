@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 
 // Function to send detailed error responses
 const sendErrorResponse = async (err, res) => {
@@ -38,7 +36,7 @@ const asyncHandler = fn => async (req, res, next) => {
         await fn(req, res, next);
 
         console.log(`[${new Date().toISOString()}] - Request to ${req.method} ${req.originalUrl} completed successfully`);
-        next();
+        
     } catch (err) {
         console.error(`[${new Date().toISOString()}] - Error in request to ${req.method} ${req.originalUrl}:`, err);
 
@@ -46,7 +44,7 @@ const asyncHandler = fn => async (req, res, next) => {
         await sendErrorResponse(err, res);
 
         // Pass the error to the next middleware
-        next(err);
+        return res.json({ success: false, message: "Error", err})
     }
 };
 

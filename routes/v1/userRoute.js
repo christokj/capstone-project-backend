@@ -1,28 +1,30 @@
 import express from "express";
-import { addToCart, checkUser, fetchUserDetails, otpHandler, updateUserProfile, userCreate, userLogin, userLogout, userProfile } from "../../controllers/userController.js";
+import { addToCart, addToOrder, checkUser, fetchUserDetails, otpHandler, removeFromCart, showCart, showOrders, updateUserProfile, userCreate, userLogin, userLogout, userProfile } from "../../controllers/userController.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import { authUser } from "../../middlewares/authUser.js";
 import { otpSender } from "../../middlewares/otpSender.js";
-import { searchProducts, showOneProduct, showProducts, showProductsByCategory } from "../../controllers/productController.js";
-// import { uploading } from "../../controllers/productController.js";
+import { searchProducts, showOneProduct, showProducts, showProductsCategory, showProductsByCategory } from "../../controllers/productController.js";
 
 const router = express.Router();
 
 router.post("/create", asyncHandler(userCreate));
 router.post("/login", asyncHandler(userLogin));
-router.post("/logout", authUser, asyncHandler(userLogout));
-router.get("/profile/:id", authUser, asyncHandler(userProfile));
-router.get("/check-user", authUser, asyncHandler(checkUser));
-router.post("/otp-handler/:id", asyncHandler(otpHandler)); 
-router.get("/otp-handler/:id", asyncHandler(otpSender), asyncHandler(otpHandler));
-router.get("/fetch-user-data/:id", asyncHandler(fetchUserDetails));
-router.put("/update-user-details/:id", asyncHandler(updateUserProfile));
-// router.get("/uploading", uploading);  
+router.get("/logout", asyncHandler(authUser), asyncHandler(userLogout));
+router.get("/profile/:id", asyncHandler(authUser), asyncHandler(userProfile));
+router.get("/check-user", asyncHandler(authUser), asyncHandler(checkUser));
+router.post("/otp-handler", asyncHandler(otpHandler));
+router.post("/otp-sender", asyncHandler(otpSender), asyncHandler(otpHandler)); 
+router.get("/fetch-user-data", asyncHandler(authUser), asyncHandler(fetchUserDetails));
+router.put("/update-user-details", asyncHandler(authUser), asyncHandler(updateUserProfile));
 router.get("/show-products", asyncHandler(showProducts));
 router.get("/show-one-product/:id", asyncHandler(showOneProduct));
-router.get("/product-category", asyncHandler(showProductsByCategory));
-router.post("/search-products", asyncHandler(searchProducts));
-router.post("/add-Cart", asyncHandler(addToCart));
-
+router.get("/products-category", asyncHandler(showProductsCategory));
+router.get("/products-by-category/:id", asyncHandler(showProductsByCategory));
+router.get("/search-products/:searchTerm", asyncHandler(searchProducts));
+router.post("/add-cart", asyncHandler(authUser), asyncHandler(addToCart));
+router.get("/show-cart", asyncHandler(authUser), asyncHandler(showCart));
+router.delete("/remove-cart/:productId", asyncHandler(authUser), asyncHandler(removeFromCart));
+// router.post("/add-order", asyncHandler(authUser), asyncHandler(addToOrder));
+// router.get("/show-orders/:userId", asyncHandler(authUser), asyncHandler(showOrders));
 
 export default router;

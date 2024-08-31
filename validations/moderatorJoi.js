@@ -33,7 +33,7 @@ const validateModeratorData = async (data) => {
                 "string.empty": "Email is required.",
                 "string.pattern.base": "Please enter valid email.",
             }),
-            role: Joi.string()
+        role: Joi.string()
             .valid('user', 'admin', 'moderator')
             .insensitive() // Makes the validation case-insensitive
             .label('Role'),

@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 // Validation function using Joi with custom logic 
-const validateUserData = async (data) => {
+export const validateUserData = async (data) => {
     const schema = Joi.object({
         fullname: Joi.string()
             .min(3)
@@ -15,13 +15,21 @@ const validateUserData = async (data) => {
                 }
                 return value;
             })
-            .required(),
+            .required()
+            .messages({
+                'string.empty': 'Fullname is required.',
+                'string.pattern.base': 'Fullname must contain only letters and spaces.',
+                'any.custom': '{{#message}}',
+                'any.required': 'Fullname is required.',
+            }),
+
         mobile: Joi.string()
             .pattern(/^\d{10}$/)
             .required()
             .messages({
-                "string.empty": "Mobile number is required.",
-                "string.pattern.base": "Mobile number must be a 10-digit number.",
+                'string.empty': 'Mobile number is required.',
+                'string.pattern.base': 'Mobile number must be a 10-digit number.',
+                'any.required': 'Mobile number is required.',
             }),
 
         email: Joi.string()
@@ -30,13 +38,15 @@ const validateUserData = async (data) => {
             .pattern(/(\<|^)[\w\d._%+-]+@(?:[\w\d-]+\.)+(\w{2,})(\>|$)/i)
             .required()
             .messages({
-                "string.empty": "Email is required.",
-                "string.pattern.base": "Please enter valid email.",
+                'string.empty': 'Email is required.',
+                'string.pattern.base': 'Please enter a valid email.',
+                'string.email': 'Please enter a valid email address.',
+                'any.required': 'Email is required.',
             }),
 
         password: Joi.string()
             .min(8)
-            .pattern(new RegExp('^[a-zA-Z0-9!@#$%^&.*]{8,100}$'))
+            .pattern(new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>~`[\]\\;'/+_=-])[a-zA-Z\d!@#$%^&*(),.?":{}|<>~`[\]\\;'/+_=-]{8,}$/))
             .custom((value, helpers) => {
                 if (value.toLowerCase().includes('password')) {
                     return helpers.error('any.custom', { message: 'Password must not contain the word "password"' });
@@ -56,27 +66,30 @@ const validateUserData = async (data) => {
             })
             .required()
             .messages({
-                'string.pattern.base': 'Password must be between 8 and 30 characters and include letters, numbers, and special characters (!@#$%^&.*).'
+                'string.pattern.base': 'Password must be between 8 and 100 characters and include letters, numbers, and special characters (!@#$%^&.*).',
+                'any.custom': '{{#message}}',
+                'any.required': 'Password is required.',
             }),
+
         address: Joi.object({
             street: Joi.string().trim().required(),
             city: Joi.string().trim().required(),
             state: Joi.string().trim().required(),
             zipCode: Joi.string().trim().required(),
             country: Joi.string().trim().required(),
-        }).required(),
+        }).required().messages({
+            'object.base': 'Address is required.',
+            'any.required': 'Address fields are required.',
+        }),
     });
 
     // Validate the data
-    const { error, fullname, email, password, mobile, address } = await schema.validateAsync(data);
-    const value = { fullname, email, password, mobile, address };
-    // Handle validation result
-    if (error) {
-        console.log('Validation error :', error.details[0].message);
-        return { success: false, message: error.details[0].message };
-    } else {
-        return { success: true, value: value };
+    try {
+        const value = await schema.validateAsync(data, { abortEarly: false });
+        return { success: true, value };
+    } catch (error) {
+        // Extract and format error messages
+        const errorMessage = error.details.map(err => err.message).join(', ');
+        return { success: false, message: errorMessage };
     }
 };
-
-export default validateUserData;

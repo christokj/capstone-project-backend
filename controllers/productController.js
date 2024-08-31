@@ -49,17 +49,52 @@ export const showOneProduct = async (req, res, next) => {
     return res.json({ success: true, message: "Success", data: product });
 }
 
-export const showProductsByCategory = async (req, res, next) => {
+export const showProductsCategory = async (req, res, next) => {
 
-    const category = await Category.find();
+    const category = await Category.find()
 
     return res.json({ success: true, message: "Success", data: category });
 }
+
+// export const showProductsById = async (req, res, next) => {
+
+//     const productsId = req.body;
+
+//     if (!productsId.length) return res.status(400).json({ success: false, message: "Products IDs are required" });
+
+//     const products = await Product.find({ _id: { $in: productsId } });
+
+//     return res.json({ success: true, message: "Success", data: products });
+
+// }
+
+export const showProductsByCategory = async ( req, res, next ) => {
+
+    const category = await Category.findById(req.params.id);
+
+    if (!category) return res.status(404).json({ success: false, message: "Category not found" });
+
+    const products = await Product.find({ category: category.name });
+
+    if (!products) return res.status(404).json({ success: false, message: "Products not found" });
+
+    return res.json({ success: true, message: "Success", data: products });
+
+}
 export const searchProducts = async (req, res, next) => {
 
-    const { search } = req.query;
+    const { searchTerm } = req.params;
+    
+    if (!searchTerm) {
+        return res.status(400).json({ success: false, message: "Search value is required" });
+    }
 
-    const products = await Product.find({ title: { $regex: search, $options: 'i' } });
+    const products = await Product.find({ 
+        title: { 
+            $regex: `\\b${searchTerm}\\b`, 
+            $options: 'i' 
+        } 
+    });
 
     return res.json({ success: true, message: "Success", data: products });
 }

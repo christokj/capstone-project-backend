@@ -9,8 +9,14 @@ import session from "express-session";
 
 const app = express();
 
+app.use(
+  cors({
+      origin: process.env.CLIENT_DOMAIN,
+      credentials: true,
+  })
+);
+
 // Middlewares
-app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
@@ -31,7 +37,7 @@ app.use(session({
   secret: "otp",
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false, maxAge: 300000 } 
+  cookie: { secure: false, maxAge: 300000 }
 }));
 
 // Routes
