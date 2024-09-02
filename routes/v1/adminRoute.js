@@ -7,13 +7,12 @@ import { upload } from "../../config/cloudinaryConfig.js";
 const router = express.Router();
 
 router.post("/login", asyncHandler(adminLogin));
-router.get("/check-admin", authAdmin, asyncHandler(checkAdmin));
-router.get("/view-users", asyncHandler(viewUsers));
-router.get("/status-user/:id", asyncHandler(handleUserStaus));
-router.get("/remove-product/:id", asyncHandler(removeProduct));
-router.get("/status-moderator/:id", asyncHandler(handleModeratorStaus));
-router.get("/view-moderators", viewModerators);
-router.post("/add-category", upload.single('image'), asyncHandler(addCategory));
-router.get("/delete-category", asyncHandler(deleteCategory));
+router.get("/check-admin", asyncHandler(authAdmin), asyncHandler(checkAdmin));
+router.get("/view-users", asyncHandler(authAdmin), asyncHandler(viewUsers));
+router.put("/update-user-status/:id", asyncHandler(authAdmin), asyncHandler(handleUserStaus));
+router.get("/view-moderators", asyncHandler(authAdmin), asyncHandler(viewModerators));
+router.put("/update-moderator-status/:id", asyncHandler(authAdmin), asyncHandler(handleModeratorStaus));
+router.delete("/remove-product/:id", asyncHandler(removeProduct));
+router.delete("/delete-category", asyncHandler(deleteCategory));
 
 export default router;

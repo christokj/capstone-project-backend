@@ -67,6 +67,11 @@ export const userLogin = async (req, res, next) => {
         return res.status(400).json({ success: false, message: "Your account is inactive", email});
     }
 
+    if (userExist.status == "frozen") {
+
+        return res.status(400).json({ success: false, message: "Your account is frozen", email});
+    }
+
     const passwordMatch = bcrypt.compareSync(password, userExist.password);
 
     if (!passwordMatch) {
@@ -206,7 +211,7 @@ if (!mobilePattern.test(mobile)) {
         const hashedPassword = await passHashing(password);
 
         const user = await User.findByIdAndUpdate(id,
-            { fullname, email, hashedPassword, mobile, address },
+            { fullname, email, password: hashedPassword, mobile, address },
             { new: true, runValidators: true } // It will return the updated document
         );
 

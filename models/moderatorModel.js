@@ -41,7 +41,6 @@ const moderatorSchema = new mongoose.Schema(
         },
         role: {
             type: String,
-            enum: ["moderator", "admin"],
             default: "moderator",
         },
         password: {
@@ -50,6 +49,11 @@ const moderatorSchema = new mongoose.Schema(
             minLength: [8, "Password must be at least 8 characters long"],
             maxLength: [100, "Password cannot exceed 100 characters"],
         },
+        shopName: {
+            type: String,
+            maxLength: [50, "Shop name cannot exceed 50 characters"],
+            trim: true,
+        }
     },
     { timestamps: true }
 );

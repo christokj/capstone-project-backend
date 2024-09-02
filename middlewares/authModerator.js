@@ -19,7 +19,6 @@ export const authModerator = (req, res, next) => {
     }
 
     req.moderator = tokenVerified;
-
     next();
 
 };

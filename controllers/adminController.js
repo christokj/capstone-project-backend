@@ -4,7 +4,7 @@ import { generateToken } from '../utils/generateToken.js';
 import { User } from '../models/userModel.js';
 import { Product } from '../models/productModel.js';
 import { Moderator } from '../models/moderatorModel.js';
-import { Category } from '../models/categorysModel.js';
+import { Category } from '../models/categoryModel.js';
 
 export const adminLogin = async (req, res, next) => {
     const { email, password, role } = req.body;
@@ -13,8 +13,8 @@ export const adminLogin = async (req, res, next) => {
         return res.status(400).json({ success: false, message: "All fields required" });
     }
     // Directly access the 'admins' collection
-    const adminExist = await mongoose.connection.collection('admins').findOne({ email, role: 'admin' });
-    console.log(adminExist)
+    const adminExist = await mongoose.connection.collection('admins').findOne({ email, role});
+    console.log(adminExist, email, password, role)
 
     if (!adminExist) {
         return res.status(404).json({ success: false, message: "Admin does not exist" });
@@ -30,24 +30,29 @@ export const adminLogin = async (req, res, next) => {
 
     res.cookie("token", token);
 
-    return res.json({ success: true, message: "Admin login successful" });
+    return res.status(200).json({ success: true, message: "Admin login successful", token });
 }
 
 
-export const checkAdmin = async (req, res, next) => {
+export const checkAdmin = (req, res, next) => {
 
-    const admin = req.admin;
+    const tokenVerified = req.admin;
 
-    if (!admin) {
+    if (!tokenVerified) {
         return res.status(400).json({ success: true, message: "Admin not authenticated" });
     }
-    return res.json({ success: true, message: "Admin authenticated" });
+
+    return res.status(200).json({ success: true, message: "Admin authenticated" });
 
 };
 
 export const viewUsers = async (req, res, next) => {
 
     const users = await User.find().select("-password");
+
+    if (!users) {
+        return res.status(500).json({ success: false, message: "Failed to fetch users" });
+    }
 
     return res.json({ success: true, users });
 }
@@ -91,9 +96,13 @@ export const removeProduct = async (req, res, next) => {
         return res.status(400).json({ success: false, message: "Product ID required" });
     }
 
-    await Product.findByIdAndDelete(id); // Find by id and removing product
+    const response = await Product.findByIdAndDelete(id); // Find by id and removing product
 
-    return res.json({ success: true, message: "Product removed successfully" });
+    if (!response) {
+        return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    return res.status(200).json({ success: true, message: "Product removed successfully" });
 }
 
 export const handleModeratorStaus = async (req, res, next) => {
