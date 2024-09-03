@@ -102,7 +102,7 @@ export const searchProducts = async (req, res, next) => {
 export const showProductCategory = async (req, res, next) => {
 
     const { id } = req.params;
-
+console.log(id)
     if (!id) {
         return res.status(400).json({ success: false, message: "Product ID required" });
     }

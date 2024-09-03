@@ -28,7 +28,7 @@ export async function sendOTP(email, otp) {
 
 // Save OTP to in-memory store
 export function getOTP(email) {
-    const otp = 123//generateOTP();
+    const otp = generateOTP();
     otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 }; // 5 minutes expiration
 
     sendOTP(email, otp);

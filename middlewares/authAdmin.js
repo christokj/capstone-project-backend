@@ -12,12 +12,12 @@ export const authAdmin = (req, res, next) => {
         if (!tokenVerified) {
             return res.status(400).json({ success: false, message: "Admin not authenticated" });
         }
-console.log(tokenVerified)
+
         if (tokenVerified.role !== 'admin') {
 
             return res.status(400).json({ message: "Admin not authenticated" });
         }
-        console.log(tokenVerified)
+       
         req.admin = tokenVerified;
 
         next();

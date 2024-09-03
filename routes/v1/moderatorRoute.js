@@ -16,8 +16,8 @@ router.post("/login", asyncHandler(moderatorLogin));
 router.get("/check-moderator", asyncHandler(authModerator), asyncHandler(checkModerator));
 router.get("/logout", asyncHandler(authModerator), asyncHandler(moderatorLogout));
 router.post("/upload", photosMiddleware.array('photos', 100), uploadImage);//
-router.post("/upload-link", uploadImageLink)
-router.delete("/remove-product/:id", removeProduct)
+router.post("/upload-link", asyncHandler(authModerator), uploadImageLink)
+router.delete("/remove-product/:id", asyncHandler(authModerator), removeProduct)
 router.post("/add-product", asyncHandler(authModerator), asyncHandler(addProduct));
 router.get("/show-products", asyncHandler(authModerator), asyncHandler(showYourProducts));
 router.get("/show-product/:id", asyncHandler(authModerator), asyncHandler(showProduct));

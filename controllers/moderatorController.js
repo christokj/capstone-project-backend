@@ -77,7 +77,7 @@ export const moderatorLogin = async (req, res, next) => {
         return res.status(400).json({ success: false, message: "Moderator not authenticated" });
     }
 
-    const token = generateToken(email);
+    const token = generateToken(email, moderatorExist.role, moderatorExist.shopName);
 
     res.cookie("token", token);
 
@@ -106,13 +106,19 @@ export const checkModerator = async (req, res, next) => {
 
 export const addProduct = async (req, res, next) => {
 
-    const { title, description, price, category, shopName, image } = req.body;
-    
-    const placeDoc = await Product.create({
+    const { title, description, price, category, image } = req.body;
+    const { shopName } = req.moderator
 
-        category, price, title, image, description, shopName
+    if (!title ||!description ||!price ||!category ||!shopName ||!image) {
+        return res.status(400).json({ success: false, message: "All fields required" });
+    }
+    console.log(title, description, price, category, shopName, image)
+    const product  = await Product.create({category, price, title, image, description, shopName});
 
-});
+if(!product ) {
+    return res.status(400).json({ success: false, message: "Failed to add product" });
+}
+
     res.status(200).json({ message: 'Product added successfully'});
   };
 

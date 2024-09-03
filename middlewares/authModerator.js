@@ -13,12 +13,13 @@ export const authModerator = (req, res, next) => {
         return res.status(400).json({ success: false, message: "Moderator not authenticated" });
     }
 
-    if (tokenVerified.role === "moderator") {
+    if (tokenVerified.role !== 'moderator') {
 
         return res.status(400).json({ message: "Moderator not authenticated" });
     }
 
     req.moderator = tokenVerified;
+
     next();
 
 };

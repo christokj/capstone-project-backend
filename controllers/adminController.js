@@ -176,7 +176,11 @@ export const deleteCategory = async (req, res, next) => {
     if (!id) {
         return res.status(400).json({ success: false, message: "Category ID required" });
     }
-    await Category.findByIdAndDelete(id);
+    const response = await Category.findByIdAndDelete(id);
+
+    if (!response) {
+        return res.status(404).json({ success: false, message: "Category not found" });
+    }
 
     return res.json({ success: true, message: "Category deleted successfully" });
 
@@ -184,13 +188,51 @@ export const deleteCategory = async (req, res, next) => {
 
 export const addCategory = async (req, res, next) => {
 
-    const { name, id } = req.body;
-    const imageUrl = req.file.path;
+    const { category, image } = req.body;
+    
+    if (!category) {
+        return res.status(400).json({ success: false, message: "Category name required" });
+    }
+    
+    const categoryExist = await Category.findOne({ name: category });
+    
+    if (categoryExist) {
+        return res.status(404).json({ success: false, message: "Category already exist" });
+    }
+    
+    const newCategory = new Category({ name: category, image });
 
-    new Category({
-        name,
-        image: imageUrl,
-    });
+    await newCategory.save();
+    
+    return res.status(200).json({ success: true, message: "Category added successfully"});
+}
 
-    return res.json({ success: true, message: "Category added successfully" });
+export const logout = (req, res, next) => {
+
+    res.clearCookie("token");
+
+    return res.status(200).json({ success: true, message: "User logged out successfully" });
+ 
+}
+
+export const fetchDatabaseDetails = async (req, res, next) => {
+
+    const userCount = await User.countDocuments();
+    if(!userCount) {
+        return res.status(500).json({ success: false, message: "Failed to fetch user count" });
+    }
+    const categoryCount = await Category.countDocuments();
+    if(!categoryCount) {
+        return res.status(500).json({ success: false, message: "Failed to fetch category count" });
+    }
+    const moderatorCount = await Moderator.countDocuments();
+    if(!moderatorCount) {
+        return res.status(500).json({ success: false, message: "Failed to fetch moderator count" });
+    }
+    const productCount = await Product.countDocuments();
+    if(!productCount) {
+        return res.status(500).json({ success: false, message: "Failed to fetch product count" });
+    }
+    
+    return res.json({ success: true, userCount, categoryCount, moderatorCount, productCount });
 }
