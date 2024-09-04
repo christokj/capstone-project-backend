@@ -11,8 +11,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_DOMAIN,
-    credentials: true,
+      origin: ["https://christo-capstone-project-frontend.vercel.app", process.env.CLIENT_DOMAIN],
+      credentials: true,
   })
 );
 
