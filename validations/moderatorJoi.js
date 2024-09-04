@@ -69,7 +69,6 @@ const validateModeratorData = async (data) => {
     const value = { fullname, email, password, mobile, role };
     // Handle validation result
     if (error) {
-        console.log('Validation error :', error.details[0].message);
         return { success: false, message: error.details[0].message };
     } else {
         return { success: true, value: value };

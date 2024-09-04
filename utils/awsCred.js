@@ -21,7 +21,7 @@ export const uploadToS3 = async (path, originalFilename, mimetype) => {
         Body: fs.readFileSync(path),
         Key: newFilename,
         ContentType: mimetype,
-        ACL: 'public-read', 
+        ACL: 'public-read',
     }));
     return `https://${bucket}.s3.amazonaws.com/${newFilename}`;
 }

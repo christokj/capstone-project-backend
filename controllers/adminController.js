@@ -13,8 +13,7 @@ export const adminLogin = async (req, res, next) => {
         return res.status(400).json({ success: false, message: "All fields required" });
     }
     // Directly access the 'admins' collection
-    const adminExist = await mongoose.connection.collection('admins').findOne({ email, role});
-    console.log(adminExist, email, password, role)
+    const adminExist = await mongoose.connection.collection('admins').findOne({ email, role });
 
     if (!adminExist) {
         return res.status(404).json({ success: false, message: "Admin does not exist" });
@@ -189,22 +188,22 @@ export const deleteCategory = async (req, res, next) => {
 export const addCategory = async (req, res, next) => {
 
     const { category, image } = req.body;
-    
+
     if (!category) {
         return res.status(400).json({ success: false, message: "Category name required" });
     }
-    
+
     const categoryExist = await Category.findOne({ name: category });
-    
+
     if (categoryExist) {
         return res.status(404).json({ success: false, message: "Category already exist" });
     }
-    
+
     const newCategory = new Category({ name: category, image });
 
     await newCategory.save();
-    
-    return res.status(200).json({ success: true, message: "Category added successfully"});
+
+    return res.status(200).json({ success: true, message: "Category added successfully" });
 }
 
 export const logout = (req, res, next) => {
@@ -212,27 +211,27 @@ export const logout = (req, res, next) => {
     res.clearCookie("token");
 
     return res.status(200).json({ success: true, message: "User logged out successfully" });
- 
+
 }
 
 export const fetchDatabaseDetails = async (req, res, next) => {
 
     const userCount = await User.countDocuments();
-    if(!userCount) {
+    if (!userCount) {
         return res.status(500).json({ success: false, message: "Failed to fetch user count" });
     }
     const categoryCount = await Category.countDocuments();
-    if(!categoryCount) {
+    if (!categoryCount) {
         return res.status(500).json({ success: false, message: "Failed to fetch category count" });
     }
     const moderatorCount = await Moderator.countDocuments();
-    if(!moderatorCount) {
+    if (!moderatorCount) {
         return res.status(500).json({ success: false, message: "Failed to fetch moderator count" });
     }
     const productCount = await Product.countDocuments();
-    if(!productCount) {
+    if (!productCount) {
         return res.status(500).json({ success: false, message: "Failed to fetch product count" });
     }
-    
+
     return res.json({ success: true, userCount, categoryCount, moderatorCount, productCount });
 }

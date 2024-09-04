@@ -12,9 +12,9 @@ export const userCreate = async (req, res, next) => {
     const data = req.body
 
     const validatedData = await validateUserData(data);
- 
-    if ( !validatedData.success ) {
-        return res.status(400).json({ success: false, message: "Invalid data", error: validatedData.message});
+
+    if (!validatedData.success) {
+        return res.status(400).json({ success: false, message: "Invalid data", error: validatedData.message });
     }
 
     const { fullname, email, password, mobile, address } = validatedData.value;
@@ -25,7 +25,6 @@ export const userCreate = async (req, res, next) => {
 
     const userExist = await User.findOne({ email }).select("-password");
     if (userExist) {
-        console.log(userExist)
         return res.status(400).json({ success: false, message: "User already exists" });
     }
 
@@ -64,12 +63,12 @@ export const userLogin = async (req, res, next) => {
 
     if (userExist.status == "inactive") {
 
-        return res.status(400).json({ success: false, message: "Your account is inactive", email});
+        return res.status(400).json({ success: false, message: "Your account is inactive", email });
     }
 
     if (userExist.status == "frozen") {
 
-        return res.status(400).json({ success: false, message: "Your account is frozen", email});
+        return res.status(400).json({ success: false, message: "Your account is frozen", email });
     }
 
     const passwordMatch = bcrypt.compareSync(password, userExist.password);
@@ -86,7 +85,7 @@ export const userLogin = async (req, res, next) => {
 
     res.cookie("token", token);
 
-    return res.json({ success: true, message: "User login successfully" , token});
+    return res.json({ success: true, message: "User login successfully", token });
 }
 
 export const userLogout = async (req, res, next) => {
@@ -118,10 +117,10 @@ export const checkUser = async (req, res, next) => {
 };
 
 export const otpHandler = async (req, res, next) => {
-    
+
     const { otp } = req.body
 
-    if ( req.session.otp && !otp ) {
+    if (req.session.otp && !otp) {
         return res.status(200).json({ success: true, message: "Otp sent to your email" });
     }
 
@@ -138,7 +137,7 @@ export const otpHandler = async (req, res, next) => {
         }
         const id = userData._id;
 
-    await User.findByIdAndUpdate(id, { status:'active' }, { new: true });
+        await User.findByIdAndUpdate(id, { status: 'active' }, { new: true });
 
         return res.status(200).json({ success: true, message: "Otp verified" });
     }
@@ -155,9 +154,9 @@ export const fetchUserDetails = async (req, res, next) => {
 
     // Verify token and get user ID
     let decoded;
- 
-        decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-  
+
+    decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
 
     const email = decoded.email;
     const user = await User.findOne({ email });
@@ -172,10 +171,10 @@ export const fetchUserDetails = async (req, res, next) => {
 }
 
 export const updateUserProfile = async (req, res, next) => {
-     
+
     const { fullname, email, password, mobile, address } = req.body;
-    
-        const token = req.cookies.token;
+
+    const token = req.cookies.token;
 
     if (!token) {
         return res.status(401).json({ success: false, message: 'User not authenticated' });
@@ -183,44 +182,43 @@ export const updateUserProfile = async (req, res, next) => {
 
     // Verify token and get user ID
     let decoded;
-   
-        decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-   
+
+    decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
 
     const emailId = decoded.email;
     const userData = await User.findOne({ email: emailId });
 
     if (!userData) {
         return res.status(401).json({ success: false, message: 'User not found' });
-    } 
+    }
 
     const id = userData._id;
 
 
-        if (!fullname || !email || !password || !mobile || !address) {
-            return res.status(400).json({ success: false, message: "All fields required" });
-        }
+    if (!fullname || !email || !password || !mobile || !address) {
+        return res.status(400).json({ success: false, message: "All fields required" });
+    }
 
-        const mobilePattern = /^\d{10,}$/;
+    const mobilePattern = /^\d{10,}$/;
 
-if (!mobilePattern.test(mobile)) {
-    return res.status(400).json({ success: false, message: "Invalid mobile number. It must have more than 10 digits." });
-}
+    if (!mobilePattern.test(mobile)) {
+        return res.status(400).json({ success: false, message: "Invalid mobile number. It must have more than 10 digits." });
+    }
 
-        //hashing
-        const hashedPassword = await passHashing(password);
+    //hashing
+    const hashedPassword = await passHashing(password);
 
-        const user = await User.findByIdAndUpdate(id,
-            { fullname, email, password: hashedPassword, mobile, address },
-            { new: true, runValidators: true } // It will return the updated document
-        );
+    const user = await User.findByIdAndUpdate(id,
+        { fullname, email, password: hashedPassword, mobile, address },
+        { new: true, runValidators: true } // It will return the updated document
+    );
 
-        if (!user) {
-            return res.status(404).json({ success: false, message: "User not found" });
-        }
-        console.log(user)
+    if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+    }
 
-        return res.status(200).json({ success: true, message: 'User updated successfully', user });
+    return res.status(200).json({ success: true, message: 'User updated successfully', user });
 
 }
 
@@ -236,9 +234,9 @@ export const addToCart = async (req, res, next) => {
 
     // Verify token and get user ID
     let decoded;
-  
-        decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-   
+
+    decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
 
     const email = decoded.email;
     const user = await User.findOne({ email });
@@ -271,7 +269,6 @@ export const addToCart = async (req, res, next) => {
         quantity,
     };
 
-    console.log(product.image)
     // If the cart doesn't exist, create a new one
     if (!cart) {
         cart = new Cart({
@@ -322,15 +319,14 @@ export const showCart = async (req, res, next) => {
         return res.status(401).json({ success: false, message: 'User not found' });
     }
     const userId = user._id;
-    
+
     if (!userId) {
         return res.status(401).json({ success: false, message: 'Invalid token' });
     }
-    
+
     // Find the user's cart
     const cart = await Cart.find({ userId: userId });
-    
-    // console.log(cart)
+
     if (!cart) {
         return res.status(404).json({ message: 'Cart not found' });
     }

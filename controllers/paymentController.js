@@ -10,7 +10,6 @@ export const paymentControl = async (req, res, next) => {
     if (!products || products.length === 0) {
         return res.status(400).json({ success: false, message: "Products required" });
     }
-console.log(products)
 
         const lineItems = products.map((product) => ({
             price_data: {
@@ -31,8 +30,6 @@ console.log(products)
             success_url: `${clientDomain}/user/payment/success`,
             cancel_url: `${clientDomain}/user/payment/cancel`,
         });
-
-        console.log('sessionId:', session.id);
 
         res.json({ success: true, message: "Payment Successfull", sessionId: session.id });
 

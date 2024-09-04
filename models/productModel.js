@@ -10,7 +10,7 @@ const ProductSchema = new Schema({
         required: true,
         trim: true,
     },
-    description: { 
+    description: {
         type: String,
         required: true,
         trim: true,
@@ -34,7 +34,7 @@ const ProductSchema = new Schema({
         required: true,
     },
     rating: {
-        type: Number, 
+        type: Number,
         default: 0,
         min: 0,
         max: 5,

@@ -13,7 +13,7 @@ router.get("/logout", asyncHandler(authUser), asyncHandler(userLogout));
 router.get("/profile/:id", asyncHandler(authUser), asyncHandler(userProfile));
 router.get("/check-user", asyncHandler(authUser), asyncHandler(checkUser));
 router.post("/otp-handler", asyncHandler(otpHandler));
-router.post("/otp-sender", asyncHandler(otpSender), asyncHandler(otpHandler)); 
+router.post("/otp-sender", asyncHandler(otpSender), asyncHandler(otpHandler));
 router.get("/fetch-user-data", asyncHandler(authUser), asyncHandler(fetchUserDetails));
 router.put("/update-user-details", asyncHandler(authUser), asyncHandler(updateUserProfile));
 router.get("/show-products", asyncHandler(showProducts));
@@ -24,7 +24,6 @@ router.get("/search-products/:searchTerm", asyncHandler(searchProducts));
 router.post("/add-cart", asyncHandler(authUser), asyncHandler(addToCart));
 router.get("/show-cart", asyncHandler(authUser), asyncHandler(showCart));
 router.delete("/remove-cart/:productId", asyncHandler(authUser), asyncHandler(removeFromCart));
-// router.post("/add-order", asyncHandler(authUser), asyncHandler(addToOrder));
-// router.get("/show-orders/:userId", asyncHandler(authUser), asyncHandler(showOrders));
+
 
 export default router;

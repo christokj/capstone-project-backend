@@ -8,8 +8,7 @@ import { deleteCategory, showProductCategory, updateCategory } from "../../contr
 
 const router = express.Router();
 
-const photosMiddleware = multer({dest:'/tmp'});
-// const upload = multer({ storage: multer.memoryStorage() });
+const photosMiddleware = multer({ dest: '/tmp' });
 
 router.post("/create", asyncHandler(moderatorCreate));
 router.post("/login", asyncHandler(moderatorLogin));

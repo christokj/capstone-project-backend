@@ -1,40 +1,6 @@
 import { Product } from "../models/productModel.js";
 import { Category } from "../models/categoryModel.js";
 
-// export const uploading = async ( req, res, next ) => {
-
-//     // const response = await axios.get("https://api.escuelajs.co/api/v1/categories");
-
-//     // const data = response.data[1]
-//     // console.log(data)
-
-//     // for (let i = 0; i < 1; i++) {
-//     //     const { id, name, image } = await response.data[5]
-//     //     console.log(response.data[5].id)
-//     //     // console.log(id, name, image)
-//     //     const newCategory = new Category({ id, name, image });
-//     //      await newCategory.save();
-//     // }
-//     // console.log(id, name , image)
-
-//     // const response = await axios.get(`https://fakestoreapi.com/products/1`);
-
-//     // console.log(response.data)
-//     for (let i = 1; i < 21 ; i++) {
-//         const response = await axios.get(`https://fakestoreapi.com/products/${i}`);
-//         const { id, title, price, description, image, category } = await response.data
-//         // let rating = Math.floor(Math.random() * 4) + 2;
-//         const { rating } = await response.data.rating
-//         // console.log(response.data[5].id)
-//         // console.log(id, name, image)
-//         const newProduct = new Product({ id, title, price, description, image, category, rating });
-//          await newProduct.save();
-//     }
-
-//     return res.json({success: true, message: "Success"});
-// }
-
-
 export const showProducts = async (req, res, next) => {
 
     const products = await Product.find();
@@ -68,7 +34,7 @@ export const showProductsCategory = async (req, res, next) => {
 
 // }
 
-export const showProductsByCategory = async ( req, res, next ) => {
+export const showProductsByCategory = async (req, res, next) => {
 
     const category = await Category.findById(req.params.id);
 
@@ -84,16 +50,16 @@ export const showProductsByCategory = async ( req, res, next ) => {
 export const searchProducts = async (req, res, next) => {
 
     const { searchTerm } = req.params;
-    
+
     if (!searchTerm) {
         return res.status(400).json({ success: false, message: "Search value is required" });
     }
 
-    const products = await Product.find({ 
-        title: { 
-            $regex: `\\b${searchTerm}\\b`, 
-            $options: 'i' 
-        } 
+    const products = await Product.find({
+        title: {
+            $regex: `\\b${searchTerm}\\b`,
+            $options: 'i'
+        }
     });
 
     return res.json({ success: true, message: "Success", data: products });
@@ -102,52 +68,50 @@ export const searchProducts = async (req, res, next) => {
 export const showProductCategory = async (req, res, next) => {
 
     const { id } = req.params;
-console.log(id)
     if (!id) {
         return res.status(400).json({ success: false, message: "Product ID required" });
     }
 
     const category = await Category.findById(id);
-    
+
     if (!category) {
         return res.status(404).json({ success: false, message: "Category not found" });
     }
 
-    return res.status(200).json({ success: true, message: "Success", category})
-} 
+    return res.status(200).json({ success: true, message: "Success", category })
+}
 
 export const updateCategory = async (req, res, next) => {
 
     const { id, category, image } = req.body;
-    
-    console.log(id, category, image)
+
     if (!id || !category || !image) {
         return res.status(400).json({ success: false, message: " All fields required" });
     }
-    
+
     const categoryDetails = await Category.findByIdAndUpdate(id, { name: category, image }, { new: true });
-    
+
     if (!categoryDetails) {
         return res.status(404).json({ success: false, message: "Category not found" });
     }
-    
+
     return res.status(200).json({ success: true, message: "Category updated successfully", category });
 }
 
 export const deleteCategory = async (req, res, next) => {
-    
+
     const { id } = req.params;
-    
+
     if (!id) {
         return res.status(400).json({ success: false, message: "Category ID required" });
     }
-    
+
     const category = await Category.findByIdAndDelete(id);
-    
+
     if (!category) {
         return res.status(404).json({ success: false, message: "Category not found" });
     }
-    
+
     return res.status(200).json({ success: true, message: "Category deleted successfully" });
 }
 
