@@ -79,14 +79,28 @@ export const moderatorLogin = async (req, res, next) => {
 
     const token = generateToken(email, moderatorExist.role, moderatorExist.shopName);
 
-    res.cookie("token", token);
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.cookie("token", token, {
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        httpOnly: true,
+        secure: isProduction, // Secure only in production
+        sameSite: isProduction ? "None" : "Lax", // 'None' for production, 'Lax' for development
+    });
 
     return res.json({ success: true, message: "Moderator login successfully", token });
 }
 
 export const moderatorLogout = async (req, res, next) => {
 
-    res.clearCookie("token"); // clearing cookies
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.clearCookie("token", {
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        httpOnly: true,
+        secure: isProduction, // Secure only in production
+        sameSite: isProduction ? "None" : "Lax", // 'None' for production, 'Lax' for development
+    }); // clearing cookies
 
     return res.json({ success: true, message: "Moderator logout successfully" });
 

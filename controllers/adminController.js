@@ -27,7 +27,14 @@ export const adminLogin = async (req, res, next) => {
 
     const token = generateToken(email, role);
 
-    res.cookie("token", token);
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.cookie("token", token, {
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        httpOnly: true,
+        secure: isProduction, // Secure only in production
+        sameSite: isProduction ? "None" : "Lax", // 'None' for production, 'Lax' for development
+    });
 
     return res.status(200).json({ success: true, message: "Admin login successful", token });
 }
@@ -208,7 +215,14 @@ export const addCategory = async (req, res, next) => {
 
 export const logout = (req, res, next) => {
 
-    res.clearCookie("token");
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.clearCookie("token", {
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        httpOnly: true,
+        secure: isProduction, // Secure only in production
+        sameSite: isProduction ? "None" : "Lax", // 'None' for production, 'Lax' for development
+    });
 
     return res.status(200).json({ success: true, message: "User logged out successfully" });
 

@@ -77,15 +77,30 @@ export const userLogin = async (req, res, next) => {
     }
 
     const token = generateToken(email);
+
+    const isProduction = process.env.NODE_ENV === "production";
+    console.log(isProduction,'====idProduction');
     
-    res.cookie("token", token );
+    res.cookie("token", token, {
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        httpOnly: true,
+        secure: isProduction, // Secure only in production
+        sameSite: isProduction ? "None" : "Lax", // 'None' for production, 'Lax' for development
+    });
 
     return res.json({ success: true, message: "User login successfully", token });
 }
 
 export const userLogout = async (req, res, next) => {
 
-    res.clearCookie("token");
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.clearCookie("token",{
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        httpOnly: true,
+        secure: isProduction, // Secure only in production
+        sameSite: isProduction ? "None" : "Lax", // 'None' for production, 'Lax' for development
+    });
 
     res.json({ success: true, message: "User logout successfully" });
 
