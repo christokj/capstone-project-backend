@@ -28,7 +28,6 @@ export const userCreate = async (req, res, next) => {
         return res.status(400).json({ success: false, message: "User already exists" });
     }
 
-
     //hashing
     const saltRounds = 12;
     const salt = await bcrypt.genSalt(saltRounds);
@@ -39,10 +38,6 @@ export const userCreate = async (req, res, next) => {
     const newUser = new User({ fullname, email, password: hashedPassword, mobile, address, status: 'inactive' });
     await newUser.save();
 
-    // //create token
-    // const token = generateToken(email);
-
-    // res.cookie("token", token);
     return res.json({ success: true, message: "User created successfully", email });
 
 }
@@ -83,7 +78,9 @@ export const userLogin = async (req, res, next) => {
 
     const token = generateToken(email);
 
-    res.cookie("token", token);
+    res.cookie("token", token, {
+        sameSite: 'None',
+    });
 
     return res.json({ success: true, message: "User login successfully", token });
 }
@@ -108,11 +105,11 @@ export const userProfile = async (req, res, next) => {
 export const checkUser = async (req, res, next) => {
 
     const user = req.user;
-
+console.log(user)
     if (!user) {
         return res.status(400).json({ success: true, message: "User not authenticated" });
     }
-    res.json({ success: true, message: "User authenticated" });
+    return res.status(200).json({ success: true, message: "User authenticated" });
 
 };
 

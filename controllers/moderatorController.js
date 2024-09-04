@@ -81,14 +81,14 @@ export const moderatorLogin = async (req, res, next) => {
 
     res.cookie("token", token);
 
-    res.json({ success: true, message: "Moderator login successfully", token });
+    return res.json({ success: true, message: "Moderator login successfully", token });
 }
 
 export const moderatorLogout = async (req, res, next) => {
 
     res.clearCookie("token"); // clearing cookies
 
-    res.json({ success: true, message: "Moderator logout successfully" });
+    return res.json({ success: true, message: "Moderator logout successfully" });
 
 };
 
@@ -99,7 +99,7 @@ export const checkModerator = async (req, res, next) => {
     if (!moderator) {
         return res.status(400).json({ success: true, message: "Moderator not authenticated" });
     }
-    res.status(200).json({ success: true, message: "Moderator authenticated" });
+    return res.status(200).json({ success: true, message: "Moderator authenticated" });
 
 };
 

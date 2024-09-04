@@ -5,8 +5,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import session from "express-session";
 
-// require('dotenv').config();
-
 const app = express();
 
 app.use(
@@ -31,14 +29,6 @@ const PORT = process.env.PORT;
 
 // Connect to MongoDB Database
 connectDB();
-
-// use cookie sessions 
-// app.use(
-// 	cookieSession({
-// 		maxAge: 1000 * 60 * 60 * 24,         // 1 day
-// 		keys: [process.env.COOKIE_SESSION_KEY],
-// 	})
-// );
 
 app.use(session({
   secret: "otp",

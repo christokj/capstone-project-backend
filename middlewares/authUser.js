@@ -10,7 +10,7 @@ export const authUser = (req, res, next) => {
 
     const tokenVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-    if (!tokenVerified) {
+    if (tokenVerified.role !== user) {
         return res.status(400).json({ success: false, message: "user not authenticated" });
     }
 

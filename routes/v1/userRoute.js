@@ -1,5 +1,5 @@
 import express from "express";
-import { addToCart, addToOrder, checkUser, fetchUserDetails, otpHandler, removeFromCart, showCart, showOrders, updateUserProfile, userCreate, userLogin, userLogout, userProfile } from "../../controllers/userController.js";
+import { addToCart, checkUser, fetchUserDetails, otpHandler, removeFromCart, showCart, updateUserProfile, userCreate, userLogin, userLogout, userProfile } from "../../controllers/userController.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import { authUser } from "../../middlewares/authUser.js";
 import { otpSender } from "../../middlewares/otpSender.js";
