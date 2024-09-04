@@ -28,13 +28,13 @@ const sendErrorResponse = async (err, res) => {
 
 // Async Handler
 const asyncHandler = fn => async (req, res, next) => {
-    // console.log(`[${new Date().toISOString()}] - Request to ${req.method} ${req.originalUrl} started`);
+    console.log(`[${new Date().toISOString()}] - Request to ${req.method} ${req.originalUrl} started`);
 
     try {
         // Execute the provided async function
         await fn(req, res, next);
 
-        // console.log(`[${new Date().toISOString()}] - Request to ${req.method} ${req.originalUrl} completed successfully`);
+        console.log(`[${new Date().toISOString()}] - Request to ${req.method} ${req.originalUrl} completed successfully`);
 
     } catch (err) {
         console.error(`[${new Date().toISOString()}] - Error in request to ${req.method} ${req.originalUrl}:`, err);

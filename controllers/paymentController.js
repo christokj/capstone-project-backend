@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 
-const clientDomain = process.env.CLIENT_DOMAIN_STRIPE;
+const clientDomain = process.env.CLIENT_DOMAIN;
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_API_KEY);
 
 export const paymentControl = async (req, res, next) => {

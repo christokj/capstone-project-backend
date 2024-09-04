@@ -1,17 +1,17 @@
 import nodemailer from 'nodemailer';
 
 // Simple in-memory store for OTPs
-const otpStore = {};
+// const otpStore = {};
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'Gmail',
     auth: {
         user: process.env.EMAIL_ADMIN,
         pass: process.env.EMAIL_PASS,
     },
 });
 
-// Generate OTP
+// Generate OTP 
 export function generateOTP() {
     return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
 }
@@ -28,9 +28,11 @@ export async function sendOTP(email, otp) {
 
 // Save OTP to in-memory store
 export function getOTP(email) {
-    const otp = generateOTP();
-    otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 }; // 5 minutes expiration
 
+    const otp = generateOTP();
+
+    // otpStore[email] = { otp, expiresAt: Date.now() + 3 * 60 * 1000 }; // 3 minutes expiration
+ 
     sendOTP(email, otp);
 
     return otp;

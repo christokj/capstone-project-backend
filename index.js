@@ -7,13 +7,6 @@ import session from "express-session";
 
 const app = express();
 
-// app.use(
-//   cors({
-//       origin: "https://christo-capstone-project-frontend.vercel.app",
-//       credentials: true,
-//   })
-// );
-
 app.use(
   cors({
       origin: process.env.CLIENT_DOMAIN,
@@ -54,3 +47,4 @@ app.all("*", (req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+ 
