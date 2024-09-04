@@ -77,10 +77,8 @@ export const userLogin = async (req, res, next) => {
     }
 
     const token = generateToken(email);
-
-    res.cookie("token", token, {
-        sameSite: 'None',
-    });
+    
+    res.cookie("token", token );
 
     return res.json({ success: true, message: "User login successfully", token });
 }
@@ -105,10 +103,11 @@ export const userProfile = async (req, res, next) => {
 export const checkUser = async (req, res, next) => {
 
     const user = req.user;
-console.log(user)
+console.log(user+"check")
     if (!user) {
         return res.status(400).json({ success: true, message: "User not authenticated" });
     }
+
     return res.status(200).json({ success: true, message: "User authenticated" });
 
 };

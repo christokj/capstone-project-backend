@@ -7,19 +7,19 @@ import session from "express-session";
 
 const app = express();
 
-app.use(
-  cors({
-      origin: "https://christo-capstone-project-frontend.vercel.app",
-      credentials: true,
-  })
-);
-
 // app.use(
 //   cors({
-//       origin: process.env.CLIENT_DOMAIN,
+//       origin: "https://christo-capstone-project-frontend.vercel.app",
 //       credentials: true,
 //   })
 // );
+
+app.use(
+  cors({
+      origin: process.env.CLIENT_DOMAIN,
+      credentials: true,
+  })
+);
 
 // Middlewares
 app.use(express.json());

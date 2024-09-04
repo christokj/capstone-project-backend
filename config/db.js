@@ -5,6 +5,7 @@ export const connectDB = () => {
         // Connecting to database using mongoose and used promise for error handling
         mongoose.connect(process.env.MONGO_URI)
             .then(() => {
+                console.log('database connected successfully');
             }).catch((err) => {
                 console.error('MongoDB connection error:', err);
             });
