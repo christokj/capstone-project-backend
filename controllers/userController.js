@@ -135,10 +135,10 @@ export const otpHandler = async (req, res, next) => {
         return res.status(400).json({ success: false, message: "Otp not sent yet" });
     }
 
+    console.log(req.session.otp)
     if (req.session.otp && !otp) {
         return res.status(200).json({ success: true, message: "Otp sent to your email", otp: req.session.otp });
     }
-
     if (!otp) {
         return res.status(400).json({ success: false, message: "Otp required" });
     }

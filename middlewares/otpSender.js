@@ -10,12 +10,12 @@ export const otpSender = async (req, res, next) => {
     }
 
     // Generating OTP
-    const otp = getOTP(email);
+    const otp = await getOTP(email);
 
     if (!otp) {
         return res.status(500).json({ success: false, message: 'Failed to generate OTP' });
     }
-
+console.log(otp)
     req.session.email = email
     req.session.otp = otp; // saving otp in the express-session
 

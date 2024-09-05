@@ -15,9 +15,9 @@ const transporter = nodemailer.createTransport({
 });
 
 // Generate OTP 
-export function generateOTP() {
-    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
-}
+// export function generateOTP() {
+//     return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+// }
 
 // Send OTP via email
 // export const sendOTP = async (email, otp) => {
@@ -46,7 +46,9 @@ export async function sendOTP({ from, to, subject, emailHtml, attachments = [] }
 // Save OTP to in-memory store
 export const getOTP = async (email) => {
 
-    const otp = generateOTP();
+    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const otp =  generatedOtp
 
     if (!process.env.EMAIL_ADMIN && !process.env.EMAIL_PASS && email) {
 
@@ -54,12 +56,18 @@ export const getOTP = async (email) => {
         return null 
     }
 
-   await sendOTP({
+   const response = await sendOTP({
         from: process.env.EMAIL_ADMIN,
         to: email,
         subject: 'Your OTP Code for Profile Update',
         emailHtml: `<p>Your OTP code is ${otp}. It will expire in 5 minutes.</p>`
     });
 
-    return otp;
+    if (!response) {
+        console.error('Failed to send OTP via email.');
+        return null;
+    } else {
+        console.log('OTP sent successfully via email.'+otp);
+        return otp;
+    }
 }
