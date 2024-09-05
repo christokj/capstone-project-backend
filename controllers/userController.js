@@ -139,19 +139,22 @@ export const otpHandler = async (req, res, next) => {
         return res.status(400).json({ success: false, message: "Otp required" });
     }
 
-    if (req.session.otp == otp) {
+    if (req.session.otp && req.session.otp === otp) {
         req.session.verified = true;
-        const email = req.session.email
+
+        const email = req.session.email;
         const userData = await User.findOne({ email });
+
         if (!userData) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
-        const id = userData._id;
 
+        const id = userData._id;
         await User.findByIdAndUpdate(id, { status: 'active' }, { new: true });
 
-        return res.status(200).json({ success: true, message: "Otp verified" });
+        return res.status(200).json({ success: true, message: "OTP verified" });
     }
+    
     return res.status(400).json({ success: false, message: "Error, Please try again" });
 };
 

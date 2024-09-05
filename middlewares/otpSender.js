@@ -20,5 +20,5 @@ export const otpSender = async (req, res, next) => {
     req.session.otp = otp; // saving otp in the express-session
 
     next();
-    
-}
+
+}   
