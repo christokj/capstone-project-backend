@@ -44,7 +44,7 @@ export async function sendOTP({ from, to, subject, emailHtml, attachments = [] }
 
 
 // Save OTP to in-memory store
-export const getOTP = (email) => {
+export const getOTP = async (email) => {
 
     const otp = generateOTP();
 
@@ -54,7 +54,7 @@ export const getOTP = (email) => {
         return null 
     }
 
-    sendOTP({
+   await sendOTP({
         from: process.env.EMAIL_ADMIN,
         to: email,
         subject: 'Your OTP Code for Profile Update',
