@@ -48,6 +48,12 @@ export const getOTP = (email) => {
 
     const otp = generateOTP();
 
+    if (!process.env.EMAIL_ADMIN && !process.env.EMAIL_PASS && email) {
+
+        console.warn('No Gmail credentials provided. OTP will not be sent.');
+        return null 
+    }
+
     sendOTP({
         from: process.env.EMAIL_ADMIN,
         to: email,

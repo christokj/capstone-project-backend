@@ -131,8 +131,12 @@ export const otpHandler = async (req, res, next) => {
 
     const { otp } = req.body
 
+    if (!req.session.otp) {
+        return res.status(400).json({ success: false, message: "Otp not sent yet" });
+    }
+
     if (req.session.otp && !otp) {
-        return res.status(200).json({ success: true, message: "Otp sent to your email" });
+        return res.status(200).json({ success: true, message: "Otp sent to your email", otp: req.session.otp });
     }
 
     if (!otp) {
