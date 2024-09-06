@@ -15,9 +15,9 @@ const transporter = nodemailer.createTransport({
 });
 
 // Generate OTP 
-// export function generateOTP() {
-//     return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
-// }
+export function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+}
 
 // Send OTP via email
 // export const sendOTP = async (email, otp) => {
@@ -67,7 +67,6 @@ export const getOTP = async (email) => {
         console.error('Failed to send OTP via email.');
         return null;
     } else {
-        console.log('OTP sent successfully via email.'+otp);
         return otp;
     }
 }

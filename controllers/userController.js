@@ -7,6 +7,8 @@ import { validateUserData } from "../validations/signUpJoi.js";
 import bcrypt from 'bcrypt';
 import { Cart } from "../models/cartModel.js";
 import jwt from "jsonwebtoken";
+import { generateOTP, getOTP, sendOTP } from "../utils/otpService.js";
+import OTP from "../models/otpModel.js";
 
 export const userCreate = async (req, res, next) => {
     const data = req.body
@@ -127,39 +129,75 @@ console.log(user+"check")
 
 };
 
+export const otpSender = async (req, res, next) => {
+
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ success: false, message: 'Email id not found' });
+    }
+
+    await OTP.findOneAndDelete({email})
+
+    // Generating OTP
+    const otp = generateOTP();
+
+    if (!otp) {
+        return res.status(500).json({ success: false, message: 'Failed to generate OTP' });
+    }
+
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    // Store OTP in MongoDB
+    const newOtp = new OTP({
+        email,
+        otp,
+        expiresAt,
+    });
+
+    await newOtp.save();
+
+    await sendOTP({
+        from: process.env.EMAIL_ADMIN,
+        to: email,
+        subject: 'Your OTP Code',
+        emailHtml: `<p>Your OTP code is ${otp}. It will expire in 5 minutes.</p>`,
+    });
+
+    return res.status(200).json({ success: true, message: 'OTP sent to your email' });
+
+}   
+
 export const otpHandler = async (req, res, next) => {
 
-    const { otp } = req.body
+    const { email, otp } = req.body;
 
-    if (!req.session.otp) {
-        return res.status(400).json({ success: false, message: "Otp not sent yet" });
-    }
-
-    console.log(req.session.otp)
-    if (req.session.otp && !otp) {
-        return res.status(200).json({ success: true, message: "Otp sent to your email", otp: req.session.otp });
-    }
     if (!otp) {
-        return res.status(400).json({ success: false, message: "Otp required" });
+        return res.status(400).json({ success: false, message: 'OTP required' });
     }
 
-    if (req.session.otp && req.session.otp === otp) {
-        req.session.verified = true;
+    if (!email) {
+        return res.status(400).json({ success: false, message: 'Email id required' });
+    }
 
-        const email = req.session.email;
-        const userData = await User.findOne({ email });
+    const otpRecord = await OTP.findOne({ email }).sort({ expiresAt: -1 });
 
-        if (!userData) {
-            return res.status(404).json({ success: false, message: "User not found" });
-        }
+    if (!otpRecord) {
+        return res.status(400).json({ success: false, message: 'OTP not found' });
+    }
 
-        const id = userData._id;
-        await User.findByIdAndUpdate(id, { status: 'active' }, { new: true });
+    if (otpRecord.expiresAt < new Date()) {
+        return res.status(400).json({ success: false, message: 'OTP expired' });
+    }
 
-        return res.status(200).json({ success: true, message: "OTP verified" });
+    if (otpRecord.otp === otp) {
+        await User.findOneAndUpdate({ email }, { status: 'active' });
+
+        await OTP.deleteOne({ _id: otpRecord._id });
+
+        return res.status(200).json({ success: true, message: 'OTP verified' });
     }
     
-    return res.status(400).json({ success: false, message: "Error, Please try again" });
+    return res.status(400).json({ success: false, message: 'Invalid OTP' });
 };
 
 export const fetchUserDetails = async (req, res, next) => {

@@ -1,8 +1,7 @@
 import express from "express";
-import { addToCart, checkUser, fetchUserDetails, otpHandler, removeFromCart, showCart, updateUserProfile, userCreate, userLogin, userLogout, userProfile } from "../../controllers/userController.js";
+import { addToCart, checkUser, fetchUserDetails, otpHandler, otpSender, removeFromCart, showCart, updateUserProfile, userCreate, userLogin, userLogout, userProfile } from "../../controllers/userController.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import { authUser } from "../../middlewares/authUser.js";
-import { otpSender } from "../../middlewares/otpSender.js";
 import { searchProducts, showOneProduct, showProducts, showProductsCategory, showProductsByCategory } from "../../controllers/productController.js";
 
 const router = express.Router();
@@ -12,8 +11,8 @@ router.post("/login", asyncHandler(userLogin));
 router.get("/logout", asyncHandler(authUser), asyncHandler(userLogout));
 router.get("/profile/:id", asyncHandler(authUser), asyncHandler(userProfile));
 router.get("/check-user", asyncHandler(authUser), asyncHandler(checkUser));
+router.post("/otp-sender", asyncHandler(otpSender));
 router.post("/otp-handler", asyncHandler(otpHandler));
-router.post("/otp-sender", asyncHandler(otpSender), asyncHandler(otpHandler));
 router.get("/fetch-user-data", asyncHandler(authUser), asyncHandler(fetchUserDetails));
 router.put("/update-user-details", asyncHandler(authUser), asyncHandler(updateUserProfile));
 router.get("/show-products", asyncHandler(showProducts));
