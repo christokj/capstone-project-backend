@@ -47,3 +47,60 @@ export const sessionStatus =  async (req, res) => {
     });
 
 }
+
+// export const success = async (req, res) => {
+
+//     const session = await stripe.checkout.sessions.retrieve(req.query.session_id)
+
+//     console.log(session)
+
+//     res.send('Payment successful')
+
+// }
+
+export const webhook = (req, res) => {
+    let event ;
+    // Only verify the event if you have an endpoint secret defined.
+    // Otherwise use the basic event deserialized with JSON.parse
+    if (process.env.STRIPE_WEBHOOK_SECRET) {
+      // Get the signature sent by Stripe
+      const signature = req.headers['stripe-signature'];
+      try {
+        event = stripe.webhooks.constructEvent(
+          req.body,
+          signature,
+          process.env.STRIPE_WEBHOOK_SECRET
+        );
+      } catch (err) {
+        console.log(`⚠️  Webhook signature verification failed.`, err.message);
+        return res.sendStatus(400);
+      }
+    }
+  
+    // Handle the event
+    switch (event.type) {
+      case 'checkout.session.completed':
+          console.log(`New payment started`);
+          console.log(event.data)
+        // Then define and call a method to handle the successful payment intent.
+        // handlePaymentIntentSucceeded(paymentIntent);
+        break;
+      case 'invoice paid':
+        console.log('Invoice paid')
+        console.log(event.data)
+        // Then define and call a method to handle the successful attachment of a PaymentMethod.
+        // handlePaymentMethodAttached(paymentMethod);
+        break;
+        case 'invoice.payment_failed':
+        console.log('Invoice payment failed')
+        console.log(event.data)
+        break;
+      default:
+        // Unexpected event type
+        console.log(`Unhandled event type ${event.type}.`);
+    }
+  
+    // Return a 200 res to acknowledge receipt of the event
+    res.send();
+  }
+   
