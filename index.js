@@ -9,7 +9,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: '*', // origin: [process.env.CLIENT_DOMAIN, 'https://checkout.stripe.com'],
+     origin: [process.env.CLIENT_DOMAIN, 'https://capstone-project-backend-ten.vercel.app/api/v1/payment/create-checkout-session', 'https://checkout.stripe.com'],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
       allowedHeaders: ['Content-Type', 'Authorization'],
