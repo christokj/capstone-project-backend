@@ -7,10 +7,8 @@ import cors from "cors";
 
 const app = express();
 
-console.log(process.env.CLIENT_DOMAIN)
-res.json(process.env.CLIENT_DOMAIN)
 const corsOptions = {
-   origin:'https://christo-capstone-project-frontend.vercel.app',// process.env.CLIENT_DOMAIN,
+   origin: [process.env.CLIENT_DOMAIN,  process.env.STRIPE_CHECKOUT_DOMAIN],// ""
    allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, // Allow credentials (cookies, etc.)
   optionSuccessStatus: 200, // Success status for older browsers (IE11, etc.)
