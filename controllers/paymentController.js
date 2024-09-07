@@ -7,9 +7,9 @@ export const paymentControl = async (req, res, next) => {
 
     const { products } = req.body;
     res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', '*');
-  res.setHeader('Access-Control-Allow-Methods', '*');
+  res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_DOMAIN);
+  res.setHeader('Access-Control-Allow-Headers', process.env.CLIENT_DOMAIN);
+  res.setHeader('Access-Control-Allow-Methods', process.env.CLIENT_DOMAIN);
   console.log("In payment control")
     if (!products || products.length === 0) {
         return res.status(400).json({ success: false, message: "Products required" });
