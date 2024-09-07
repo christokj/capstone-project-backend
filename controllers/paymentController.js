@@ -6,6 +6,8 @@ const stripe = new Stripe(process.env.STRIPE_PRIVATE_API_KEY);
 export const paymentControl = async (req, res, next) => {
 
     const { products } = req.body;
+    res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_DOMAIN);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
   console.log("In payment control")
     if (!products || products.length === 0) {
         return res.status(400).json({ success: false, message: "Products required" });
