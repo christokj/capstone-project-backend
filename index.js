@@ -6,30 +6,20 @@ import cors from "cors";
 // import session from "express-session";
 
 const app = express();
-app.use(express.json());
-app.use(cookieParser());
 
-const allowedOrigins = [process.env.CLIENT_DOMAIN, "https://checkout.stripe.com"];
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    // Check if the incoming origin is in the list of allowed origins
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true); // Origin is allowed
-    } else {
-      callback(new Error('Not allowed by CORS')); // Origin is not allowed
-    }
-  },
+   origin: process.env.CLIENT_DOMAIN,// "https://checkout.stripe.com"
+   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, // Allow credentials (cookies, etc.)
-  optionSuccessStatus: 200 // Success status for older browsers (IE11, etc.)
+  optionSuccessStatus: 200, // Success status for older browsers (IE11, etc.)
 };
 
 app.use(cors(corsOptions));
 
 // Middlewares
+app.use(express.json());
+app.use(cookieParser());
 
 
 const PORT = process.env.PORT;
