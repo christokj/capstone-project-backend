@@ -4,10 +4,9 @@ const clientDomain = process.env.CLIENT_DOMAIN;
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_API_KEY);
 
 export const paymentControl = async (req, res, next) => {
-res.json('in payment method')
+
     const { products } = req.body;
     
-  console.log("In payment control")
     if (!products || products.length === 0) {
         return res.status(400).json({ success: false, message: "Products required" });
     }
@@ -32,7 +31,7 @@ res.json('in payment method')
             cancel_url: `${clientDomain}/user/payment/cancel`,
         });
 
-        res.json({url: session.url})
+        res.json({ success: true, sessionId: session.id });
 };
 
 export const sessionStatus =  async (req, res) => {
