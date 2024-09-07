@@ -10,7 +10,7 @@ const app = express();
 console.log(process.env.CLIENT_DOMAIN)
 res.json(process.env.CLIENT_DOMAIN)
 const corsOptions = {
-   origin: process.env.CLIENT_DOMAIN,// "https://checkout.stripe.com"
+   origin: [process.env.CLIENT_DOMAIN, 'https://christo-capstone-project-frontend.vercel.app', 'https://checkout.stripe.com'],// ""
    allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, // Allow credentials (cookies, etc.)
   optionSuccessStatus: 200, // Success status for older browsers (IE11, etc.)
