@@ -7,7 +7,8 @@ import cors from "cors";
 
 const app = express();
 
-
+console.log(process.env.CLIENT_DOMAIN)
+res.json(process.env.CLIENT_DOMAIN)
 const corsOptions = {
    origin: process.env.CLIENT_DOMAIN,// "https://checkout.stripe.com"
    allowedHeaders: ['Content-Type', 'Authorization'],

@@ -4,7 +4,7 @@ const clientDomain = process.env.CLIENT_DOMAIN;
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_API_KEY);
 
 export const paymentControl = async (req, res, next) => {
-
+res.json('in payment method')
     const { products } = req.body;
     res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_DOMAIN);
