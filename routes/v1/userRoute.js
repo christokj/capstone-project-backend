@@ -3,7 +3,6 @@ import { addToCart, checkUser, fetchUserDetails, otpHandler, otpSender, removeFr
 import asyncHandler from "../../utils/asyncHandler.js";
 import { authUser } from "../../middlewares/authUser.js";
 import { searchProducts, showOneProduct, showProducts, showProductsCategory, showProductsByCategory } from "../../controllers/productController.js";
-import { webhook } from "../../controllers/paymentController.js";
 
 const router = express.Router();
 
@@ -24,6 +23,5 @@ router.get("/search-products/:searchTerm", asyncHandler(searchProducts));
 router.post("/add-cart", asyncHandler(authUser), asyncHandler(addToCart));
 router.get("/show-cart", asyncHandler(authUser), asyncHandler(showCart));
 router.delete("/remove-cart/:productId", asyncHandler(authUser), asyncHandler(removeFromCart));
-router.post('/webhook', express.raw({type: 'application/json'}), asyncHandler(webhook));
 
 export default router;

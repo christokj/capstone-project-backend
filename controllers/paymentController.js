@@ -6,7 +6,7 @@ const stripe = new Stripe(process.env.STRIPE_PRIVATE_API_KEY);
 export const paymentControl = async (req, res, next) => {
 
     const { products } = req.body;
-
+  console.log("In payment control")
     if (!products || products.length === 0) {
         return res.status(400).json({ success: false, message: "Products required" });
     }
@@ -31,7 +31,7 @@ export const paymentControl = async (req, res, next) => {
             cancel_url: `${clientDomain}/user/payment/cancel`,
         });
 
-        res.json({ success: true, message: "Payment Successfull", sessionId: session.id });
+        return res.status(200).json({ success: true, message: "Payment Successfull", sessionId: session.id });
 
 };
 
@@ -48,15 +48,6 @@ export const sessionStatus =  async (req, res) => {
 
 }
 
-// export const success = async (req, res) => {
-
-//     const session = await stripe.checkout.sessions.retrieve(req.query.session_id)
-
-//     console.log(session)
-
-//     res.send('Payment successful')
-
-// }
 
 export const webhook = (req, res) => {
     let event ;
