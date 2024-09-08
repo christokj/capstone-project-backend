@@ -3,25 +3,25 @@ import Stripe from 'stripe';
 const clientDomain = process.env.CLIENT_DOMAIN;
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_API_KEY);
 
-export const paymentControl = async (req, res, next) => {
+export const paymentControl = async (req, res) => {
+  try {
+    const { products } = req.body;
+    if (!products || products.length === 0) {
+      return res.status(400).json({ success: false, message: "Products required" });
+    }
 
-  const { products } = req.body;
-  if (!products || products.length === 0) {
-    return res.status(400).json({ success: false, message: "Products required" });
-  }
-
-  if (products && stripe) {
     const lineItems = await products.map((product) => ({
       price_data: {
         currency: "inr",
         product_data: {
-          name: product?.productDetails?.title,
-          images: [product?.productDetails?.image[0]],
+          name: product?.productDetails?.title || 'Unnamed Product',
+          images: product?.productDetails?.image ? [product.productDetails.image[0]] : [],
         },
-        unit_amount: Math.round(83 * product.productDetails.price * 100),
+        unit_amount: Math.round(83 * (product?.productDetails?.price || 0) * 100),
       },
-      quantity: product?.productDetails?.quantity,
+      quantity: product?.productDetails?.quantity || 1,
     }));
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
@@ -29,12 +29,11 @@ export const paymentControl = async (req, res, next) => {
       success_url: `${clientDomain}/user/payment/success`,
       cancel_url: `${clientDomain}/user/payment/cancel`,
     });
-    if (session) {
 
-      return res.status(200).json({ success: true, sessionId: session.id });
-    } else {
-      return res.status(500).json({ success: false, message: 'Error creating checkout session' });
-    }
+    return res.status(200).json({ success: true, sessionId: session.id });
+  } catch (error) {
+    console.error('Stripe session creation error:', error.message, error.stack);
+    return res.status(500).json({ success: false, message: 'Error creating checkout session', error: error.message });
   }
 };
 
