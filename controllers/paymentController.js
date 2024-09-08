@@ -6,23 +6,23 @@ const stripe = new Stripe(process.env.STRIPE_PRIVATE_API_KEY);
 export const paymentControl = async (req, res, next) => {
 
     const { products } = req.body;
-    
     if (!products || products.length === 0) {
         return res.status(400).json({ success: false, message: "Products required" });
     }
 
-        const lineItems = products.map((product) => ({
-            price_data: {
-                currency: "inr",
-                product_data: {
-                    name: product?.productDetails?.title,
-                    images: [product?.productDetails?.image[0]],
-                },
-                unit_amount: Math.round(83 * product.productDetails.price * 100), 
+    if (products && stripe) {
+      const lineItems = await products.map((product) => ({
+        price_data: {
+            currency: "inr",
+            product_data: {
+                name: product?.productDetails?.title,
+                images: [product?.productDetails?.image[0]],
             },
-            quantity: product?.productDetails?.quantity,
-        }));
-
+            unit_amount: Math.round(83 * product.productDetails.price * 100), 
+        },
+        quantity: product?.productDetails?.quantity,
+    }));
+    res.json("in if")
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             line_items: lineItems,
@@ -32,6 +32,7 @@ export const paymentControl = async (req, res, next) => {
         });
 
         res.json({ success: true, sessionId: session.id });
+      }
 };
 
 export const sessionStatus =  async (req, res) => {
