@@ -22,15 +22,18 @@ export const paymentControl = async (req, res) => {
       quantity: product?.productDetails?.quantity || 1,
     }));
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      mode: "payment",
-      success_url: `${clientDomain}/user/payment/success`,
-      cancel_url: `${clientDomain}/user/payment/cancel`,
-    });
+if (stripe) {
 
-    return res.status(200).json({ success: true, sessionId: session.id });
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: lineItems,
+    mode: "payment",
+    success_url: `${clientDomain}/user/payment/success`,
+    cancel_url: `${clientDomain}/user/payment/cancel`,
+  });
+  
+  return res.status(200).json({ success: true, sessionId: session.id });
+}
   } catch (error) {
     console.error('Stripe session creation error:', error.message, error.stack);
     return res.status(500).json({ success: false, message: 'Error creating checkout session', error: error.message });
