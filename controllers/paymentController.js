@@ -1,42 +1,86 @@
 import Stripe from 'stripe';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 const clientDomain = process.env.CLIENT_DOMAIN;
-const stripe = new Stripe(process.env.STRIPE_PRIVATE_API_KEY);
+const stripeApiKey = process.env.STRIPE_PRIVATE_API_KEY;
+
+// Validate environment variables
+if (!clientDomain) {
+  console.error('CLIENT_DOMAIN is not set in the environment variables.');
+  process.exit(1);
+}
+
+if (!stripeApiKey) {
+  console.error('STRIPE_PRIVATE_API_KEY is not set in the environment variables.');
+  process.exit(1);
+}
+
+// Initialize Stripe with API version
+const stripe = new Stripe(stripeApiKey, {
+  apiVersion: '2024-06-20', 
+});
 
 export const paymentControl = async (req, res) => {
   try {
+    console.log('Received payment request');
+
     const { products } = req.body;
     if (!products || products.length === 0) {
+      console.warn('No products received in the request');
       return res.status(400).json({ success: false, message: "Products required" });
     }
 
-    const lineItems = await products.map((product) => ({
+    console.log('Processing products:', JSON.stringify(products, null, 2));
+
+    const lineItems = products.map((product) => ({
       price_data: {
         currency: "inr",
         product_data: {
           name: product?.productDetails?.title || 'Unnamed Product',
-          images: product?.productDetails?.image ? [product.productDetails.image[0]] : [],
+          images: product?.productDetails?.image && product.productDetails.image.length > 0
+            ? [product.productDetails.image[0]]
+            : [],
         },
         unit_amount: Math.round(83 * (product?.productDetails?.price || 0) * 100),
       },
       quantity: product?.productDetails?.quantity || 1,
     }));
 
-if (stripe) {
+    console.log('Created line items:', JSON.stringify(lineItems, null, 2));
 
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
-    line_items: lineItems,
-    mode: "payment",
-    success_url: `${clientDomain}/user/payment/success`,
-    cancel_url: `${clientDomain}/user/payment/cancel`,
-  });
-  
-  return res.status(200).json({ success: true, sessionId: session.id });
-}
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      mode: "payment",
+      success_url: `${clientDomain}/user/payment/success`,
+      cancel_url: `${clientDomain}/user/payment/cancel`,
+    });
+
+    console.log('Stripe session created successfully');
+    return res.status(200).json({ success: true, sessionId: session.id });
+
   } catch (error) {
-    console.error('Stripe session creation error:', error.message, error.stack);
-    return res.status(500).json({ success: false, message: 'Error creating checkout session', error: error.message });
+    console.error('Stripe session creation error:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    // Check for specific Stripe errors
+    if (error.type === 'StripeAuthenticationError') {
+      console.error('Stripe Authentication Error. Please check your API key.');
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Error authenticating with Stripe. Please contact support.',
+        error: 'Stripe Authentication Error'
+      });
+    }
+
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Error creating checkout session', 
+      error: error.message 
+    });
   }
 };
 
