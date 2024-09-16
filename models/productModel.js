@@ -39,6 +39,12 @@ const ProductSchema = new Schema({
         min: 0,
         max: 5,
     },
+    reviews: [
+        new mongoose.Schema({
+            userName: { type: String, required: true },
+            message: { type: String, required: true }
+        }, { _id: false })  
+    ]
 }, {
     timestamps: true,
 });

@@ -499,3 +499,60 @@ export const showOrders = async (req, res, next) => {
     return res.status(200).json({ success: true, message: 'User orders fetched successfully', orderHistory: userOrders.orderHistory });
 
 }
+
+export const addReview = async (req, res, next) => {
+
+    const {review, id}  = req.body
+    const {token} = req.cookies;
+
+    if (!token) {
+        return res.status(401).json({ success: false, message: 'User not authenticated' });
+    }
+
+    let decoded;
+
+    decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    const email = decoded.email;
+    
+    const userName = await User.findOne({ email: email }, 'fullname');
+
+    if (!userName) {
+        return res.status(404).json({ success: false, message: 'User name not found' });
+    }
+
+    const {fullname} = userName
+
+    // await Product.findByIdAndUpdate(id, {reviews: {message: review, userName: fullname}})
+    const product = await Product.findById(id)
+
+    if (!product) {
+        return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    const newReview = {
+        userName: fullname,
+        message: review
+    };
+
+    product.reviews.push(newReview);
+
+    await product.save();
+
+    return res.status(200).json({ success: true, message: 'Review added successfully' });
+
+}  
+
+export const showReview = async (req, res, next) => {
+
+    const { id } = req.params;
+
+    // Fetch the product by ID and only retrieve the 'reviews' field
+    const product = await Product.findById(id, 'reviews');
+
+    if (!product) {
+        return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    return res.status(200).json({ success: true, data: product.reviews });
+}

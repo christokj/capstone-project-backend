@@ -1,5 +1,5 @@
 import express from "express";
-import { addToCart, checkUser, fetchUserDetails, otpHandler, otpSender, removeFromCart, showCart, updateUserProfile, userCreate, userLogin, userLogout, userProfile } from "../../controllers/userController.js";
+import { addReview, addToCart, checkUser, fetchUserDetails, otpHandler, otpSender, removeFromCart, showCart, showReview, updateUserProfile, userCreate, userLogin, userLogout, userProfile } from "../../controllers/userController.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import { authUser } from "../../middlewares/authUser.js";
 import { searchProducts, showOneProduct, showProducts, showProductsCategory, showProductsByCategory } from "../../controllers/productController.js";
@@ -23,5 +23,7 @@ router.get("/search-products/:searchTerm", asyncHandler(searchProducts));
 router.post("/add-cart", asyncHandler(authUser), asyncHandler(addToCart));
 router.get("/show-cart", asyncHandler(authUser), asyncHandler(showCart));
 router.delete("/remove-cart/:productId", asyncHandler(authUser), asyncHandler(removeFromCart));
+router.post("/addReview", asyncHandler(authUser), asyncHandler(addReview))
+router.get("/showReview/:id", asyncHandler(authUser), asyncHandler(showReview))
 
 export default router;
