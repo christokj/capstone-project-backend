@@ -122,7 +122,7 @@ export const addProduct = async (req, res, next) => {
     }
 
     const tokenVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const shopName = tokenVerified.shopName
+    const {shopName} = tokenVerified
 
     if (!title || !description || !price || !category || !shopName || !image) {
         return res.status(400).json({ success: false, message: "All fields required" });
