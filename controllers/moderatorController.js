@@ -213,7 +213,15 @@ export const showProduct = async (req, res, next) => {
 
 export const updateProduct = async (req, res, next) => {
 
-    const { id, title, description, price, category, shopName, image } = req.body;
+    const { id, title, description, price, category, image } = req.body;
+
+    const { token } = await req.cookies;
+    if (!token) {
+        return res.status(400).json({ success: false, message: "Moderator not authenticated" });
+    }
+
+    const tokenVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const {shopName} = tokenVerified
 
     if (!id || !title || !description || !price || !category || !shopName || !image) {
 
