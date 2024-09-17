@@ -81,7 +81,7 @@ export const userLogin = async (req, res, next) => {
     const token = generateToken(email);
 
     const isProduction = process.env.NODE_ENV === "production";
-    console.log(isProduction,'====idProduction');
+    // console.log(isProduction,'====idProduction');
     
     res.cookie("token", token, {
         maxAge: 24 * 60 * 60 * 1000, // 1 day
@@ -120,7 +120,6 @@ export const userProfile = async (req, res, next) => {
 export const checkUser = async (req, res, next) => {
 
     const user = req.user;
-console.log(user+"check")
     if (!user) {
         return res.status(400).json({ success: true, message: "User not authenticated" });
     }

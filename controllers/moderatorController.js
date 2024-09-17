@@ -122,7 +122,6 @@ export const addProduct = async (req, res, next) => {
 
     const { title, description, price, category, image } = await req.body;
     const { shopName } = await req.moderator
-console.log(shopName)
     if (!title || !description || !price || !category || !shopName || !image) {
         return res.status(400).json({ success: false, message: "All fields required" });
     }

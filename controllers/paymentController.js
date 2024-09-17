@@ -27,15 +27,12 @@ const stripe = new Stripe(stripeApiKey, {
 
 export const paymentControl = async (req, res) => {
   try {
-    console.log('Received payment request');
 
     const { products } = req.body;
     if (!products || products.length === 0) {
       console.warn('No products received in the request');
       return res.status(400).json({ success: false, message: "Products required" });
     }
-
-    console.log('Processing products:', JSON.stringify(products, null, 2));
 
     const lineItems = products.map((product) => ({
       price_data: {
@@ -51,8 +48,6 @@ export const paymentControl = async (req, res) => {
       quantity: product?.productDetails?.quantity || 1,
     }));
 
-    console.log('Created line items:', JSON.stringify(lineItems, null, 2));
-
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
@@ -61,7 +56,6 @@ export const paymentControl = async (req, res) => {
       cancel_url: `${clientDomain}/user/payment/cancel`,
     });
 
-    console.log('Stripe session created successfully');
     return res.status(200).json({ success: true, sessionId: session.id });
 
   } catch (error) {
@@ -112,12 +106,10 @@ export const emailHandler = async (req, res) => {
     if (!token) {
         return res.status(401).json({ success: false, message: 'User not authenticated' });
     }
-console.log(token)
     // Verify token and get user ID
     let decoded;
     try {
         decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-        console.log(decoded)
     } catch (err) {
         return res.status(401).json({ success: false, message: 'Invalid token' });
     }
