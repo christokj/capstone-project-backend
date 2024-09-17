@@ -116,7 +116,7 @@ export const checkModerator = async (req, res, next) => {
 export const addProduct = async (req, res, next) => {
 
     const { title, description, price, category, image } = await req.body;
-    const { token } = req.cookies;
+    const { token } = await req.cookies;
     if (!token) {
         return res.status(400).json({ success: false, message: "Moderator not authenticated" });
     }
@@ -172,7 +172,7 @@ export const showYourProducts = async (req, res, next) => {
     }
     
     const products = await Product.find({ shopName: moderatorDetails[0].shopName });
-    
+
     if (!products) {
         return res.status(404).json({ success: false, message: "Products not found" });
     }
