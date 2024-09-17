@@ -33,11 +33,8 @@ const validateModeratorData = async (data) => {
                 "string.empty": "Email is required.",
                 "string.pattern.base": "Please enter valid email.",
             }),
-        role: Joi.string()
-            .valid('user', 'admin', 'moderator')
-            .insensitive() // Makes the validation case-insensitive
-            .label('Role'),
-
+        shopName: Joi.string()
+            .required(),
         password: Joi.string()
             .min(8)
             .pattern(new RegExp('^[a-zA-Z0-9!@#$%^&.*]{8,100}$'))
@@ -65,8 +62,8 @@ const validateModeratorData = async (data) => {
     });
 
     // Validate the data
-    const { error, fullname, email, password, mobile, role } = await schema.validateAsync(data);
-    const value = { fullname, email, password, mobile, role };
+    const { error, fullname, email, password, mobile, shopName } = await schema.validateAsync(data);
+    const value = { fullname, email, password, mobile, shopName };
     // Handle validation result
     if (error) {
         return { success: false, message: error.details[0].message };

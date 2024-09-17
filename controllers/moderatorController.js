@@ -4,14 +4,13 @@ import { generateToken } from "../utils/generateToken.js";
 import validateModeratorData from "../validations/moderatorJoi.js";
 import { uploadToS3 } from "../utils/awsCred.js";
 import { Product } from "../models/productModel.js";
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+// import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import imageDownloader from 'image-downloader';
 import mime from 'mime-types';
-import { User } from "../models/userModel.js";
 import { Category } from "../models/categoryModel.js";
 import { passHashing } from "../utils/passwordHashing.js";
 
-const s3 = new S3Client({ region: process.env.AWS_REGION });
+// const s3 = new S3Client({ region: process.env.AWS_REGION });
 
 export const moderatorCreate = async (req, res, next) => {
 
@@ -19,9 +18,9 @@ export const moderatorCreate = async (req, res, next) => {
 
     const validatedData = await validateModeratorData(data);
 
-    const { fullname, email, password, mobile } = validatedData.value;
+    const { fullname, email, password, mobile, shopName } = validatedData.value;
 
-    if (!fullname || !email || !password || !mobile) {
+    if (!fullname || !email || !password || !mobile || !shopName) {
         return res.status(400).json({ success: false, message: "All fields required" });
     }
 
@@ -30,19 +29,14 @@ export const moderatorCreate = async (req, res, next) => {
     if (moderatorExist) {
         return res.status(404).json({ success: false, message: "Moderator already exist" });
     }
-
     //hashing
     const salt = 10;
     const hashedPassword = bcrypt.hashSync(password, salt);
 
     //create new user
-    const newModerator = new Moderator({ fullname, email, password: hashedPassword, mobile, role: "moderator" });
+    const newModerator = new Moderator({ fullname, email, password: hashedPassword, shopName, mobile, role: "moderator" });
     await newModerator.save();
 
-    //create token
-    const token = generateToken(email, "moderator");
-
-    res.cookie("token", token);
     res.json({ success: true, message: "Moderator created successfully" });
 
 };
@@ -76,7 +70,7 @@ export const moderatorLogin = async (req, res, next) => {
     if (!passwordMatch) {
         return res.status(400).json({ success: false, message: "Moderator not authenticated" });
     }
-
+console.log(moderatorExist)
     const token = generateToken(email, moderatorExist.role, moderatorExist.shopName);
 
     const isProduction = process.env.NODE_ENV === "production";
@@ -168,10 +162,9 @@ export const showYourProducts = async (req, res, next) => {
     if (!moderatorDetails) {
         return res.status(404).json({ success: false, message: "Moderator details not found" });
     }
-
-    const products = await Product.find({ shopName: moderatorDetails[0].shopName });
-
-    if (!products) {
+    
+    const products = await Product.findOne({ shopName: moderatorDetails[0].shopName });
+    if (products === null) {
         return res.status(404).json({ success: false, message: "Products not found" });
     }
 
