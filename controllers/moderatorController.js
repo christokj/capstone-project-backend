@@ -4,6 +4,7 @@ import { generateToken } from "../utils/generateToken.js";
 import validateModeratorData from "../validations/moderatorJoi.js";
 import { uploadToS3 } from "../utils/awsCred.js";
 import { Product } from "../models/productModel.js";
+import jwt from "jsonwebtoken";
 // import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import imageDownloader from 'image-downloader';
 import mime from 'mime-types';
@@ -115,7 +116,14 @@ export const checkModerator = async (req, res, next) => {
 export const addProduct = async (req, res, next) => {
 
     const { title, description, price, category, image } = await req.body;
-    const { shopName } = await req.moderator
+    const { token } = req.cookies;
+    if (!token) {
+        return res.status(400).json({ success: false, message: "Moderator not authenticated" });
+    }
+
+    const tokenVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const shopName = tokenVerified.shopName
+
     if (!title || !description || !price || !category || !shopName || !image) {
         return res.status(400).json({ success: false, message: "All fields required" });
     }
@@ -164,11 +172,11 @@ export const showYourProducts = async (req, res, next) => {
     }
     
     const products = await Product.find({ shopName: moderatorDetails[0].shopName });
-    if (products === null) {
+    
+    if (!products) {
         return res.status(404).json({ success: false, message: "Products not found" });
     }
-
-    return res.json({ success: true, message: "Success", data: products });
+    return res.status(200).json({ success: true, message: "Success", data: products });
 
 }
 
