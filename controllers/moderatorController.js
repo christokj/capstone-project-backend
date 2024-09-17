@@ -71,7 +71,6 @@ export const moderatorLogin = async (req, res, next) => {
     if (!passwordMatch) {
         return res.status(400).json({ success: false, message: "Moderator not authenticated" });
     }
-console.log(moderatorExist)
     const token = generateToken(email, moderatorExist.role, moderatorExist.shopName);
 
     const isProduction = process.env.NODE_ENV === "production";
@@ -286,6 +285,17 @@ export const updateProfile = async (req, res, next) => {
     if (!moderator) {
         return res.status(404).json({ success: false, message: "Moderator not found" });
     }
+
+    const token = generateToken(email, "moderator", shopName);
+
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.cookie("token", token, {
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        httpOnly: true,
+        secure: isProduction, // Secure only in production
+        sameSite: isProduction ? "None" : "Lax", // 'None' for production, 'Lax' for development
+    });
 
     return res.status(200).json({ success: true, message: "Profile updated successfully", data: moderator });
 }
