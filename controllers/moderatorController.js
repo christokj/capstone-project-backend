@@ -163,7 +163,7 @@ export const showYourProducts = async (req, res, next) => {
         return res.status(404).json({ success: false, message: "Moderator details not found" });
     }
     
-    const products = await Product.findOne({ shopName: moderatorDetails[0].shopName });
+    const products = await Product.find({ shopName: moderatorDetails[0].shopName });
     if (products === null) {
         return res.status(404).json({ success: false, message: "Products not found" });
     }
