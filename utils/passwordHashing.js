@@ -8,4 +8,4 @@ export const passHashing = async pass => {
     const salt = await bcrypt.genSalt(saltRounds);
 
     return bcrypt.hashSync(pass, salt);
-}
+} 

@@ -3,7 +3,7 @@ import fs from 'fs';
 
 export const uploadToS3 = async (path, originalFilename, mimetype) => {
     const client = new S3Client({
-        region: AWS_REGION,
+        region: process.env.AWS_REGION,
         credentials: {
             accessKeyId: process.env.S3_ACCESS_KEY,
             secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
