@@ -22,7 +22,7 @@ if (!stripeApiKey) {
 
 // Initialize Stripe with API version
 const stripe = new Stripe(stripeApiKey, {
-  apiVersion: '2024-06-20', 
+  apiVersion: '2024-06-20',
 });
 
 export const paymentControl = async (req, res) => {
@@ -32,6 +32,18 @@ export const paymentControl = async (req, res) => {
     if (!products || products.length === 0) {
       console.warn('No products received in the request');
       return res.status(400).json({ success: false, message: "Products required" });
+    }
+    const productsData = [];
+
+    if (products && products.length > 0) {
+      for (let i = 0; i < products.length; i++) {
+        productsData.push({
+          productTitle: products[i]?.productDetails?.title,
+          price: products[i]?.productDetails?.price,
+          productId: products[i]?.productId,
+          quantity: products[i]?.productDetails?.quantity,
+        });
+      }
     }
 
     const lineItems = products.map((product) => ({
@@ -43,7 +55,7 @@ export const paymentControl = async (req, res) => {
             ? [product.productDetails.image[0]]
             : [],
         },
-        unit_amount: Math.round(83 * (product?.productDetails?.price || 0) * 100),
+        unit_amount: Math.round(product.productDetails.price * 83 * 100),
       },
       quantity: product?.productDetails?.quantity || 1,
     }));
@@ -52,7 +64,7 @@ export const paymentControl = async (req, res) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${clientDomain}/user/payment/success?session_id={CHECKOUT_SESSION_ID}&product=${encodeURIComponent(products[0]?.productDetails?.title || '')}&price=${products[0]?.productDetails?.price || 0}`,
+      success_url: `${clientDomain}/user/payment/success?session_id={CHECKOUT_SESSION_ID}&productsData=${JSON.stringify(productsData)}`,
       cancel_url: `${clientDomain}/user/payment/cancel`,
     });
 
@@ -61,21 +73,21 @@ export const paymentControl = async (req, res) => {
   } catch (error) {
     console.error('Stripe session creation error:', error.message);
     console.error('Error stack:', error.stack);
-    
+
     // Check for specific Stripe errors
     if (error.type === 'StripeAuthenticationError') {
       console.error('Stripe Authentication Error. Please check your API key.');
-      return res.status(500).json({ 
-        success: false, 
+      return res.status(500).json({
+        success: false,
         message: 'Error authenticating with Stripe. Please contact support.',
         error: 'Stripe Authentication Error'
       });
     }
 
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Error creating checkout session', 
-      error: error.message 
+    return res.status(500).json({
+      success: false,
+      message: 'Error creating checkout session',
+      error: error.message
     });
   }
 };
@@ -97,26 +109,26 @@ export const emailHandler = async (req, res) => {
 
   const { token } = req.cookies;
 
-  const {sessionId, productName, productPrice} = req.body
+  const { sessionId, productName, productPrice } = req.body
 
   if (!sessionId || !productName || !productPrice) {
     return res.status(400).json({ success: false, message: 'All fields required' });
   }
 
-    if (!token) {
-        return res.status(401).json({ success: false, message: 'User not authenticated' });
-    }
-    // Verify token and get user ID
-    let decoded;
-    try {
-        decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-    } catch (err) {
-        return res.status(401).json({ success: false, message: 'Invalid token' });
-    }
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'User not authenticated' });
+  }
+  // Verify token and get user ID
+  let decoded;
+  try {
+    decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+  } catch (err) {
+    return res.status(401).json({ success: false, message: 'Invalid token' });
+  }
 
-    const email = decoded.email;
+  const email = decoded.email;
 
-     // Email subject and message
+  // Email subject and message
   const subject = 'Payment Confirmation: Thank you for your purchase!';
   const emailHtml = `
     <h1>Thank you for your purchase!</h1>
@@ -134,7 +146,7 @@ export const emailHandler = async (req, res) => {
     to: email,
     subject,
     emailHtml
-});
+  });
 
 }
 

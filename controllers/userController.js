@@ -329,7 +329,7 @@ export const addToCart = async (req, res, next) => {
         cart = new Cart({
             userId,
             products: [{ productId, quantity, productDetails }],
-            totalPrice: productPrice * quantity,
+            totalPrice: Math.round((productPrice * 83) * quantity),
         });
     } else {
         // Check if the product already exists in the cart
@@ -337,13 +337,13 @@ export const addToCart = async (req, res, next) => {
 
         if (productIndex >= 0) {
             // If the product is already in the cart, update the quantity and product details
-            cart.products[productIndex].quantity += quantity;
+            cart.products[productIndex].productDetails.quantity += quantity;
             // Optionally, update productDetails if they might change; usually, they don't.
-            cart.totalPrice += productPrice * quantity;
+            cart.totalPrice += Math.round((productPrice * 83) * quantity);
         } else {
             // If the product is not in the cart, add it
             cart.products.push({ productId, productDetails });
-            cart.totalPrice += productPrice * quantity;
+            cart.totalPrice += Math.round((productPrice * 83) * quantity);
         }
     }
 
@@ -485,12 +485,20 @@ export const addToOrder = async (req, res, next) => {
 
 export const showOrders = async (req, res, next) => {
 
-    const { userId } = req.params;
+    const { token } = req.cookies;
+    if (!token) {
+        return res.status(400).json({ success: false, message: "user not authenticated" });
+    }
+    const tokenVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    const { email } = tokenVerified;
+
+    const userId = await User.findOne({ email }).select('_id'); 
+
     const userOrders = await User.findById(userId).select('orderHistory').populate({
         path: 'orderHistory.productId', // Populate the productId within orderHistory
-        select: 'name price' // Select specific fields to return from the Product model
     });
-
+console.log(userOrders)
     if (!userOrders) {
         return res.status(404).json({ success: false, message: "User not found" });
     }
@@ -554,4 +562,80 @@ export const showReview = async (req, res, next) => {
     }
 
     return res.status(200).json({ success: true, data: product.reviews });
+}
+
+export const saveOrders = async (req, res, next) => {
+
+    const { productsData } = req.body;
+    const parsedProductsData = JSON.parse(productsData);
+
+    const { token } = req.cookies;
+    if (!token) {
+        return res.status(400).json({ success: false, message: "user not authenticated" });
+    }
+    const tokenVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    const { email } = tokenVerified;
+
+    const userId = await User.findOne({ email }).select('_id'); 
+
+    if (parsedProductsData && parsedProductsData.length > 0) {
+        try {
+            for (const product of parsedProductsData) {
+                await User.findByIdAndUpdate(
+                    userId,
+                    {
+                        $push: {orderHistory: {productId: product.productId, quantity: product.quantity,},},
+                    }
+                );
+            }
+
+            await Cart.deleteOne({userId})
+            
+            return res.status(200).json({ success: true, message: 'Products logged successfully' });
+        } catch (error) {
+            console.error('Error updating user:', error);
+            return res.status(500).json({ success: false, message: 'Error logging products' });
+        }
+    } else {
+        console.log('No products found');
+        return res.status(400).json({ success: false, message: 'No products found to log' });
+    }
+
+}
+export const updateCartQuantity = async (req, res, next) => {
+
+    const { productId, quantity } = req.body;
+    const { token } = req.cookies;
+    if (!token) {
+        return res.status(400).json({ success: false, message: "user not authenticated" });
+    }
+    const tokenVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    const { email } = tokenVerified;
+
+    const userId = await User.findOne({ email }).select('_id'); 
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+        return res.status(404).json({ message: "Cart not found" });
+    }
+
+    const product = cart.products.find(p => p.productId.toString() === productId);
+
+    if (!product) {
+        return res.status(404).json({ message: "Product not found in cart" });
+    }
+
+    product.productDetails.quantity = quantity;
+
+    cart.totalPrice = cart.products.reduce((total, item) => {
+        return total + (item.productDetails.price * item.productDetails.quantity);
+    }, 0);
+
+    cart.totalPrice *= 83
+    await cart.save();
+
+    return res.status(200).json({ message: "Quantity updated successfully" });
 }
