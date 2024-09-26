@@ -498,7 +498,7 @@ export const showOrders = async (req, res, next) => {
     const userOrders = await User.findById(userId).select('orderHistory').populate({
         path: 'orderHistory.productId', // Populate the productId within orderHistory
     });
-console.log(userOrders)
+
     if (!userOrders) {
         return res.status(404).json({ success: false, message: "User not found" });
     }
@@ -511,7 +511,11 @@ export const addReview = async (req, res, next) => {
 
     const {review, id}  = req.body
     const {token} = req.cookies;
+    
+if (!review || !id) {
+    return res.status(401).json({ success: false, message: 'Review message is empty' }); 
 
+}
     if (!token) {
         return res.status(401).json({ success: false, message: 'User not authenticated' });
     }
