@@ -82,7 +82,7 @@ export const userLogin = async (req, res, next) => {
 
     const isProduction = process.env.NODE_ENV === "production";
     // console.log(isProduction,'====idProduction');
-    
+
     res.cookie("token", token, {
         maxAge: 24 * 60 * 60 * 1000, // 1 day
         httpOnly: true,
@@ -97,7 +97,7 @@ export const userLogout = async (req, res, next) => {
 
     const isProduction = process.env.NODE_ENV === "production";
 
-    res.clearCookie("token",{
+    res.clearCookie("token", {
         maxAge: 24 * 60 * 60 * 1000, // 1 day
         httpOnly: true,
         secure: isProduction, // Secure only in production
@@ -136,7 +136,7 @@ export const otpSender = async (req, res, next) => {
         return res.status(400).json({ success: false, message: 'Email id not found' });
     }
 
-    await OTP.findOneAndDelete({email})
+    await OTP.findOneAndDelete({ email })
 
     // Generating OTP
     const otp = generateOTP();
@@ -164,7 +164,7 @@ export const otpSender = async (req, res, next) => {
 
     return res.status(200).json({ success: true, message: 'OTP sent to your email' });
 
-}   
+}
 
 export const otpHandler = async (req, res, next) => {
 
@@ -195,7 +195,7 @@ export const otpHandler = async (req, res, next) => {
 
         return res.status(200).json({ success: true, message: 'OTP verified' });
     }
-    
+
     return res.status(400).json({ success: false, message: 'Invalid OTP' });
 };
 
@@ -493,7 +493,7 @@ export const showOrders = async (req, res, next) => {
 
     const { email } = tokenVerified;
 
-    const userId = await User.findOne({ email }).select('_id'); 
+    const userId = await User.findOne({ email }).select('_id');
 
     const userOrders = await User.findById(userId).select('orderHistory').populate({
         path: 'orderHistory.productId', // Populate the productId within orderHistory
@@ -509,41 +509,49 @@ export const showOrders = async (req, res, next) => {
 
 export const addReview = async (req, res, next) => {
 
-    const {review, id}  = req.body
-    const {token} = req.cookies;
-    
-if (!review || !id) {
-    return res.status(401).json({ success: false, message: 'Review message is empty' }); 
+    const { review, id } = req.body
+    const { token } = req.cookies;
 
-}
+    if (!review || !id) {
+        return res.status(401).json({ success: false, message: 'Review message is empty' });
+    }
     if (!token) {
         return res.status(401).json({ success: false, message: 'User not authenticated' });
     }
 
-    let decoded;
+    // let decoded;
 
-    decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-    const email = decoded.email;
-    
+    const { email } = decoded;
+
+    if (!email) {
+        return res.status(404).json({ success: false, message: 'User email not found' });
+    }
+
     const userName = await User.findOne({ email: email }, 'fullname');
 
     if (!userName) {
         return res.status(404).json({ success: false, message: 'User name not found' });
     }
 
-    const {fullname} = userName
+    const { fullname } = userName
 
-    // await Product.findByIdAndUpdate(id, {reviews: {message: review, userName: fullname}})
     const product = await Product.findById(id)
 
     if (!product) {
         return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
+    const isExist = product.reviews.find(review => review.email === email);
+
+    if (isExist) {
+        return res.status(404).json({ success: false, message: 'You are already added review' });
+    }
     const newReview = {
         userName: fullname,
-        message: review
+        message: review,
+        email: email
     };
 
     product.reviews.push(newReview);
@@ -552,7 +560,7 @@ if (!review || !id) {
 
     return res.status(200).json({ success: true, message: 'Review added successfully' });
 
-}  
+}
 
 export const showReview = async (req, res, next) => {
 
@@ -581,7 +589,7 @@ export const saveOrders = async (req, res, next) => {
 
     const { email } = tokenVerified;
 
-    const userId = await User.findOne({ email }).select('_id'); 
+    const userId = await User.findOne({ email }).select('_id');
 
     if (parsedProductsData && parsedProductsData.length > 0) {
         try {
@@ -589,13 +597,13 @@ export const saveOrders = async (req, res, next) => {
                 await User.findByIdAndUpdate(
                     userId,
                     {
-                        $push: {orderHistory: {productId: product.productId, quantity: product.quantity,},},
+                        $push: { orderHistory: { productId: product.productId, quantity: product.quantity, }, },
                     }
                 );
             }
 
-            await Cart.deleteOne({userId})
-            
+            await Cart.deleteOne({ userId })
+
             return res.status(200).json({ success: true, message: 'Products logged successfully' });
         } catch (error) {
             console.error('Error updating user:', error);
@@ -618,7 +626,7 @@ export const updateCartQuantity = async (req, res, next) => {
 
     const { email } = tokenVerified;
 
-    const userId = await User.findOne({ email }).select('_id'); 
+    const userId = await User.findOne({ email }).select('_id');
 
     const cart = await Cart.findOne({ userId });
 

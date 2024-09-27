@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
-// The user schema
 const userSchema = new Schema(
     {
         fullname: {
@@ -62,12 +61,8 @@ const userSchema = new Schema(
         },
         status: {
             type: String,
-            enum: ["active", "inactive", "suspended"],
+            enum: ["active", "inactive", "frozen"],
             default: "active",
-        },
-        lastLogin: {
-            type: Date,
-            default: Date.now,
         },
     },
     {
@@ -75,33 +70,9 @@ const userSchema = new Schema(
     }
 );
 
-// Index creation for email
-userSchema.index({ email: 1 }, { unique: true });
-
 // Virtual property for full name in uppercase
 userSchema.virtual("fullnameUpperCase").get(function () {
     return this.fullname.toUpperCase();
 });
 
-// Pre-save hook to format mobile number (e.g., adding country code)
-userSchema.pre("save", function (next) {
-    if (this.isModified("mobile")) {
-        this.mobile = `+91${this.mobile}`; // Automatically adding a country code (e.g., +91 for India)
-    }
-    next();
-});
-
-// Method to check if the user is active
-userSchema.methods.isActive = function () {
-    return this.status === "active";
-};
-
-// Method to update last login time
-userSchema.methods.updateLastLogin = function () {
-    this.lastLogin = Date.now();
-    return this.save();
-};
-
-
-// Export the user model
 export const User = mongoose.model("User", userSchema);
