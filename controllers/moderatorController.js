@@ -34,7 +34,7 @@ export const moderatorCreate = async (req, res, next) => {
     const salt = 10;
     const hashedPassword = bcrypt.hashSync(password, salt);
 
-    //create new user
+    //create new moderator
     const newModerator = new Moderator({ fullname, email, password: hashedPassword, shopName, mobile, role: "moderator" });
     await newModerator.save();
 
@@ -280,10 +280,17 @@ export const updateProfile = async (req, res, next) => {
 
     const hashedPassword = await passHashing(password);
 
-    const moderator = await Moderator.findOneAndUpdate({ email }, { fullname, mobile, password: hashedPassword, shopName }, { new: true });
+    const moderatorExist = await Moderator.findOne({ email, role: 'moderator' });
 
-    if (!moderator) {
-        return res.status(404).json({ success: false, message: "Moderator not found" });
+    if (moderatorExist) {
+        const moderator = await Moderator.findOneAndUpdate({ email }, { fullname, mobile, password: hashedPassword, shopName }, { new: true });
+        // return res.status(404).json({ success: false, message: "Moderator already exist" });
+    }
+
+    if (!moderatorExist) {
+
+        const newModerator = new Moderator({ fullname, email, password: hashedPassword, shopName, mobile, role: "moderator" });
+        await newModerator.save();
     }
 
     const token = generateToken(email, "moderator", shopName);
@@ -297,5 +304,5 @@ export const updateProfile = async (req, res, next) => {
         sameSite: isProduction ? "None" : "Lax", // 'None' for production, 'Lax' for development
     });
 
-    return res.status(200).json({ success: true, message: "Profile updated successfully", data: moderator });
+    return res.status(200).json({ success: true, message: "Profile updated successfully", });
 }
